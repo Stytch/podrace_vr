@@ -102,20 +102,20 @@ public class SFX_Controller : MonoBehaviour
     private float nextSFX_accelerating = 0.0f;
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.KeypadMultiply) )
+        if (Input.GetKeyDown(KeyCode.KeypadMultiply) || Input.GetButtonDown("joystick button 6"))
         {
             print("reset !");
             transform.position = Vector3.zero;
             transform.localEulerAngles = Vector3.zero;
         }
 
-        if (keyStartButtonDown() && engineState == 0)
+        if ((Input.GetKeyDown(KeyCode.Keypad0) || Input.GetButtonDown("joystick button 7")) && engineState == 0)
         {
             print("Engine_Start");
             sources[0].PlayOneShot(clips[0]);
             Invoke("Engine_Start", duration_engine_starting);
         }
-        else if (Input.GetKeyDown(KeyCode.Keypad0) && engineState == 1)
+        else if ((Input.GetKeyDown(KeyCode.Keypad0) || Input.GetButtonDown("joystick button 7")) && engineState == 1)
         {
             print("Engine_Shutdown");
             sources[0].PlayOneShot(clips[7]);
@@ -139,7 +139,7 @@ public class SFX_Controller : MonoBehaviour
 
                 if (Input.GetKey(KeyCode.Keypad2))
                 {
-                    enginePowerR = Mathf.Lerp(enginePowerR, 1f + (Input.GetKey(KeyCode.Keypad3)? enginePowerBoostAddition : 0f), Time.deltaTime * enginePowerAcceleration);
+                    enginePowerR = Mathf.Lerp(enginePowerR, 1f + (Input.GetKey(KeyCode.Keypad3) ? enginePowerBoostAddition : 0f), Time.deltaTime * enginePowerAcceleration);
                 }
                 else
                 {
@@ -153,9 +153,15 @@ public class SFX_Controller : MonoBehaviour
                     nextSFX_accelerating = Time.timeSinceLevelLoad + 10f;
                 }
             }
-            else // BY VR HAND
+            else // BY XBOX CONTROLLER
             {
-                //TODO
+                enginePowerL = Mathf.Lerp(enginePowerL, Input.GetAxis("LT") + (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5") ? enginePowerBoostAddition : 0f), Time.deltaTime * enginePowerAcceleration*2);
+                enginePowerR = Mathf.Lerp(enginePowerR, Input.GetAxis("RT") + (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5") ? enginePowerBoostAddition : 0f), Time.deltaTime * enginePowerAcceleration*2);
+                if (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5") && Time.timeSinceLevelLoad > nextSFX_accelerating)
+                {
+                    sources[0].PlayOneShot(clips[6]);
+                    nextSFX_accelerating = Time.timeSinceLevelLoad + 10f;
+                }
             }
 
             // DIRECTION CALC
@@ -174,9 +180,9 @@ public class SFX_Controller : MonoBehaviour
             //SPEED CALC // MAXSPEED = 100f
             podSpeed_target = (float)(Math.Pow((enginePowerR + enginePowerL), 2) * 25d);
             podSpeed = Mathf.Lerp(podSpeed, podSpeed_target, Time.deltaTime * podSpeed_variation);
-            sources[1].pitch = 0.9f + (podSpeed / 100f)*0.2f;
-            sources[3].pitch = 0.8f + (podSpeed / 100f)*0.4f;
-            sources[1].volume = 1f-Mathf.Max(- 0.5f + podSpeed / 85f,0.0f);
+            sources[1].pitch = 0.9f + (podSpeed / 100f) * 0.2f;
+            sources[3].pitch = 0.8f + (podSpeed / 100f) * 0.4f;
+            sources[1].volume = 1f - Mathf.Max(-0.5f + podSpeed / 85f, 0.0f);
             //sources[2].volume = Mathf.Max(- 0.5f + podSpeed / 90f,0.2f);
             sources[2].volume = Mathf.Max(-0.5f + (enginePowerR + enginePowerL) / 50f, 0.2f);
 
@@ -210,15 +216,15 @@ public class SFX_Controller : MonoBehaviour
             //HOVERCRAFT FORCE
             RaycastHit hit;
             /**BUG ICI=============================================*/
-            Vector3 hoverDirection = Quaternion.AngleAxis(1, transform.right)* transform.forward;
+            Vector3 hoverDirection = Quaternion.AngleAxis(1, transform.right) * transform.forward;
             Vector3 hoverUp = transform.up;
-            if (Physics.Raycast(transform.position, Vector3.down, out hit, body_hover_height*100f, terrainMask))
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, body_hover_height * 100f, terrainMask))
             {
                 Debug.DrawRay(transform.position, Vector3.down * hit.distance, Color.yellow);
-                Debug.DrawRay(hit.point, hit.normal*10f, Color.red);
+                Debug.DrawRay(hit.point, hit.normal * 10f, Color.red);
                 hoverDirection = Quaternion.AngleAxis(90, transform.right) * hit.normal;
                 hoverUp = hit.normal;
-                Debug.DrawRay(hit.point, hoverDirection*10f, Color.cyan);
+                Debug.DrawRay(hit.point, hoverDirection * 10f, Color.cyan);
                 body.AddForce(Vector3.up * (body_hover_height - hit.distance) * ground_repulsation * (UnityEngine.Random.Range(1f, body_hover_height / 2f)), ForceMode.Acceleration);
             }
 
@@ -250,12 +256,12 @@ public class SFX_Controller : MonoBehaviour
             lastvelocity = body.velocity.sqrMagnitude;
 
             //SPOON OPENING
-            spoon_left_top.transform.localEulerAngles           = new Vector3((1f - Mathf.Min(enginePowerL, 1f) ) * spoon_opening_mult, 0, 0);   //+ UnityEngine.Random.Range(-0.1f, 0.1f)
-            spoon_left_downleft.transform.localEulerAngles      = new Vector3((1f - Mathf.Min(enginePowerL, 1f) ) * spoon_opening_mult, 0, 0);  //+ UnityEngine.Random.Range(-0.1f, 0.1f)
-            spoon_left_downright.transform.localEulerAngles     = new Vector3((1f - Mathf.Min(enginePowerL, 1f) ) * spoon_opening_mult, 0, 0); //+ UnityEngine.Random.Range(-0.1f, 0.1f)
-            spoon_right_top.transform.localEulerAngles          = new Vector3((1f - Mathf.Min(enginePowerR, 1f) ) * spoon_opening_mult, 0, 0);   //+ UnityEngine.Random.Range(-0.1f, 0.1f)
-            spoon_right_downleft.transform.localEulerAngles     = new Vector3((1f - Mathf.Min(enginePowerR, 1f) ) * spoon_opening_mult, 0, 0);  //+ UnityEngine.Random.Range(-0.1f, 0.1f)
-            spoon_right_downright.transform.localEulerAngles    = new Vector3((1f - Mathf.Min(enginePowerR, 1f) ) * spoon_opening_mult, 0, 0); //+ UnityEngine.Random.Range(-0.1f, 0.1f)
+            spoon_left_top.transform.localEulerAngles = new Vector3((1f - Mathf.Min(enginePowerL, 1f)) * spoon_opening_mult, 0, 0);   //+ UnityEngine.Random.Range(-0.1f, 0.1f)
+            spoon_left_downleft.transform.localEulerAngles = new Vector3((1f - Mathf.Min(enginePowerL, 1f)) * spoon_opening_mult, 0, 0);  //+ UnityEngine.Random.Range(-0.1f, 0.1f)
+            spoon_left_downright.transform.localEulerAngles = new Vector3((1f - Mathf.Min(enginePowerL, 1f)) * spoon_opening_mult, 0, 0); //+ UnityEngine.Random.Range(-0.1f, 0.1f)
+            spoon_right_top.transform.localEulerAngles = new Vector3((1f - Mathf.Min(enginePowerR, 1f)) * spoon_opening_mult, 0, 0);   //+ UnityEngine.Random.Range(-0.1f, 0.1f)
+            spoon_right_downleft.transform.localEulerAngles = new Vector3((1f - Mathf.Min(enginePowerR, 1f)) * spoon_opening_mult, 0, 0);  //+ UnityEngine.Random.Range(-0.1f, 0.1f)
+            spoon_right_downright.transform.localEulerAngles = new Vector3((1f - Mathf.Min(enginePowerR, 1f)) * spoon_opening_mult, 0, 0); //+ UnityEngine.Random.Range(-0.1f, 0.1f)
         }
     }
 
