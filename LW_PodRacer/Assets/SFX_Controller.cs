@@ -44,6 +44,7 @@ public class SFX_Controller : MonoBehaviour
     public float enginePowerBoostAddition = 0.5f;
     public float enginePowerAcceleration = 5f;
     public float enginePowerDeceleration = 5f;
+    public float podDamage = 0;
 
     [Header("INPUT_Direction")]
     public float podRotation = 0;
@@ -70,6 +71,8 @@ public class SFX_Controller : MonoBehaviour
     public Image dir;
     public Text angle;
     public Text speed;
+    public Text velocity;
+    public Text damage;
 
 
     [Header("VFX_SPOONS")]
@@ -80,6 +83,7 @@ public class SFX_Controller : MonoBehaviour
     public GameObject spoon_right_downright;
     public GameObject spoon_right_downleft;
     public float spoon_opening_mult;
+    //TODO : Target angle with interpolation
 
     private void Awake()
     {
@@ -107,6 +111,7 @@ public class SFX_Controller : MonoBehaviour
             print("reset !");
             transform.position = Vector3.zero;
             transform.localEulerAngles = Vector3.zero;
+            podSpeed = 0f;
         }
 
         if ((Input.GetKeyDown(KeyCode.Keypad0) || Input.GetButtonDown("joystick button 7")) && engineState == 0)
@@ -184,7 +189,7 @@ public class SFX_Controller : MonoBehaviour
             sources[3].pitch = 0.8f + (podSpeed / 100f) * 0.4f;
             sources[1].volume = 1f - Mathf.Max(-0.5f + podSpeed / 85f, 0.0f);
             //sources[2].volume = Mathf.Max(- 0.5f + podSpeed / 90f,0.2f);
-            sources[2].volume = Mathf.Max(-0.5f + (enginePowerR + enginePowerL) / 50f, 0.2f);
+            sources[2].volume = Mathf.Max(-0.5f + (enginePowerR + enginePowerL) / 10f, 0.2f);
 
             // WIND PERTUBATION SFX CALC
             //TODO volume perturb = speed * angle
@@ -192,18 +197,21 @@ public class SFX_Controller : MonoBehaviour
             // ENGINE SFX CALC
             //TODO 
 
-            // UPDATE HUD
-            dir.transform.localRotation = Quaternion.Euler(0, 0, (podRotation * 90f));
-            angle.text = (podRotation * 90f).ToString("F") + "°";
-            speed.text = podSpeed.ToString("F") + "m/s";
-            dict_Sliders["Power_L"].setValue(enginePowerL);
-            dict_Sliders["Power_R"].setValue(enginePowerR);
-
+            UpdateHUDDebugger();
 
         }
     }
     //private void FixedUpdate()
-
+    void UpdateHUDDebugger()
+    {
+        // UPDATE HUD
+        dir.transform.localRotation = Quaternion.Euler(0, 0, (podRotation * 90f));
+        angle.text = (podRotation * 90f).ToString("F") + "°";
+        speed.text = podSpeed.ToString("F") + "m/s";
+        dict_Sliders["Power_L"].setValue(enginePowerL);
+        dict_Sliders["Power_R"].setValue(enginePowerR);
+        velocity.text = body.velocity.ToString();
+    }
     private LayerMask terrainMask;
     private void FixedUpdate()
     {
@@ -216,9 +224,9 @@ public class SFX_Controller : MonoBehaviour
             //HOVERCRAFT FORCE
             RaycastHit hit;
             /**BUG ICI=============================================*/
-            Vector3 hoverDirection = Quaternion.AngleAxis(1, transform.right) * transform.forward;
+            Vector3 hoverDirection = Quaternion.AngleAxis( 10f-transform.localEulerAngles.x, transform.right) * transform.forward;
             Vector3 hoverUp = transform.up;
-            if (Physics.Raycast(transform.position, Vector3.down, out hit, body_hover_height * 100f, terrainMask))
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, body_hover_height * 2f, terrainMask))
             {
                 Debug.DrawRay(transform.position, Vector3.down * hit.distance, Color.yellow);
                 Debug.DrawRay(hit.point, hit.normal * 10f, Color.red);
@@ -226,6 +234,11 @@ public class SFX_Controller : MonoBehaviour
                 hoverUp = hit.normal;
                 Debug.DrawRay(hit.point, hoverDirection * 10f, Color.cyan);
                 body.AddForce(Vector3.up * (body_hover_height - hit.distance) * ground_repulsation * (UnityEngine.Random.Range(1f, body_hover_height / 2f)), ForceMode.Acceleration);
+            }
+            else
+            {
+                body.AddForce(Physics.gravity, ForceMode.Acceleration);
+
             }
 
             //SPEED BY ENGINE FORCE
@@ -248,7 +261,7 @@ public class SFX_Controller : MonoBehaviour
                 nextSFX_slowing = Time.timeSinceLevelLoad + 10f;
             }
             //HEAVY SLOW
-            if (body.velocity.sqrMagnitude < 16f && Time.timeSinceLevelLoad > nextSFX_Heavyslowing)
+            if (body.velocity.sqrMagnitude < 32f && Time.timeSinceLevelLoad > nextSFX_Heavyslowing)
             {
                 sources[0].PlayOneShot(clips[5]);
                 nextSFX_Heavyslowing = Time.timeSinceLevelLoad + 20f;
