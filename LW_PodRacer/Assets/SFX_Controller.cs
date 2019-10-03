@@ -224,9 +224,9 @@ public class SFX_Controller : MonoBehaviour
             //HOVERCRAFT FORCE
             RaycastHit hit;
             /**BUG ICI=============================================*/
-            Vector3 hoverDirection = Quaternion.AngleAxis( 10f-transform.localEulerAngles.x, transform.right) * transform.forward;
+            Vector3 hoverDirection = Quaternion.AngleAxis( 5f-transform.localEulerAngles.x, transform.right) * transform.forward;
             Vector3 hoverUp = transform.up;
-            if (Physics.Raycast(transform.position, Vector3.down, out hit, body_hover_height * 2f, terrainMask))
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, 1000f, terrainMask))
             {
                 Debug.DrawRay(transform.position, Vector3.down * hit.distance, Color.yellow);
                 Debug.DrawRay(hit.point, hit.normal * 10f, Color.red);
@@ -237,7 +237,7 @@ public class SFX_Controller : MonoBehaviour
             }
             else
             {
-                body.AddForce(Physics.gravity, ForceMode.Acceleration);
+                body.AddForce(Physics.gravity*10f, ForceMode.Acceleration);
 
             }
 
