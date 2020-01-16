@@ -66,7 +66,7 @@ public class SFX_Controller : MonoBehaviour
     public float duration_engine_acceleratorStrike = 2f;
     public float duration_engine_decelerationStrike = 2f;
 
-    [Header("SFX_HUD_DEBUGGER")]
+    [Header("HUD_DEBUGGER")]
     public bool useKeyboard = true;
     public Image dir;
     public Text angle;
@@ -74,6 +74,8 @@ public class SFX_Controller : MonoBehaviour
     public Text velocity;
     public Text damage;
 
+    [Header("UI_COCKPIT")]
+    public PodRacer_UI podui;
 
     [Header("VFX_SPOONS")]
     public GameObject spoon_left_top;
@@ -160,8 +162,16 @@ public class SFX_Controller : MonoBehaviour
             }
             else // BY XBOX CONTROLLER
             {
-                enginePowerL = Mathf.Lerp(enginePowerL, Input.GetAxis("LT") + (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5") ? enginePowerBoostAddition : 0f), Time.deltaTime * enginePowerAcceleration*2);
-                enginePowerR = Mathf.Lerp(enginePowerR, Input.GetAxis("RT") + (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5") ? enginePowerBoostAddition : 0f), Time.deltaTime * enginePowerAcceleration*2);
+                enginePowerL = Mathf.Lerp(enginePowerL,
+                    (Input.GetKey(KeyCode.Keypad2) ? 1 : 0)
+                    + Input.GetAxis("LT")
+                    + (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5") ? enginePowerBoostAddition : 0f)
+                    , Time.deltaTime * enginePowerAcceleration * 2);
+                enginePowerR = Mathf.Lerp(enginePowerR,
+                    (Input.GetKey(KeyCode.Keypad1) ? 1 : 0)
+                    + Input.GetAxis("RT")
+                    + (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5") ? enginePowerBoostAddition : 0f)
+                    , Time.deltaTime * enginePowerAcceleration * 2);
                 if (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5") && Time.timeSinceLevelLoad > nextSFX_accelerating)
                 {
                     sources[0].PlayOneShot(clips[6]);
@@ -198,8 +208,16 @@ public class SFX_Controller : MonoBehaviour
             //TODO 
 
             UpdateHUDDebugger();
+            UpdateCockpitUI();
 
         }
+    }
+    void UpdateCockpitUI()
+    {
+        podui.powerimg_l.fillAmount = enginePowerL;
+        podui.powerimg_r.fillAmount = enginePowerR;
+        podui.text_dir.text = (podRotation * 90f).ToString("F") + "°";
+        podui.text_spd.text = podSpeed.ToString("F") + "m/s";
     }
     //private void FixedUpdate()
     void UpdateHUDDebugger()
@@ -224,7 +242,7 @@ public class SFX_Controller : MonoBehaviour
             //HOVERCRAFT FORCE
             RaycastHit hit;
             /**BUG ICI=============================================*/
-            Vector3 hoverDirection = Quaternion.AngleAxis( 5f-transform.localEulerAngles.x, transform.right) * transform.forward;
+            Vector3 hoverDirection = Quaternion.AngleAxis(5f - transform.localEulerAngles.x, transform.right) * transform.forward;
             Vector3 hoverUp = transform.up;
             if (Physics.Raycast(transform.position, Vector3.down, out hit, 1000f, terrainMask))
             {
@@ -237,7 +255,7 @@ public class SFX_Controller : MonoBehaviour
             }
             else
             {
-                body.AddForce(Physics.gravity*10f, ForceMode.Acceleration);
+                body.AddForce(Physics.gravity * 10f, ForceMode.Acceleration);
 
             }
 
