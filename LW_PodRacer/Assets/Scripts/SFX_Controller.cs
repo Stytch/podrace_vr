@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.PostProcessing;
 using UnityEngine.UI;
 
 public class SFX_Controller : MonoBehaviour
@@ -20,6 +21,16 @@ public class SFX_Controller : MonoBehaviour
     public float body_inclinaison_maxangle = 45f;
     public float body_hover_height = 4f;
 
+
+    [Header("Reactors")]
+    public PodRacer_Reactor LeftReactor;
+    public PodRacer_Reactor RightReactor;
+
+    [Header("Lightning")]
+    public GameObject[] LightningAnimation;
+    //public Light LightningLight;
+
+    public PostProcessingProfile postprocess;
 
     [Header("SFX_Engine_Power")]
     /// <summary>
@@ -76,16 +87,6 @@ public class SFX_Controller : MonoBehaviour
 
     [Header("UI_COCKPIT")]
     public PodRacer_UI podui;
-
-    [Header("VFX_SPOONS")]
-    public GameObject spoon_left_top;
-    public GameObject spoon_left_downright;
-    public GameObject spoon_left_downleft;
-    public GameObject spoon_right_top;
-    public GameObject spoon_right_downright;
-    public GameObject spoon_right_downleft;
-    public float spoon_opening_mult;
-    //TODO : Target angle with interpolation
 
     private void Awake()
     {
@@ -195,11 +196,13 @@ public class SFX_Controller : MonoBehaviour
             //SPEED CALC // MAXSPEED = 100f
             podSpeed_target = (float)(Math.Pow((enginePowerR + enginePowerL), 2) * 25d);
             podSpeed = Mathf.Lerp(podSpeed, podSpeed_target, Time.deltaTime * podSpeed_variation);
-            sources[1].pitch = 0.9f + (podSpeed / 100f) * 0.2f;
-            sources[3].pitch = 0.8f + (podSpeed / 100f) * 0.4f;
+            sources[1].pitch = 0.8f + (podSpeed / 180f) * 0.3f;
+            sources[3].pitch = 0.9f + (podSpeed / 180f) * 0.2f;
+            sources[4].pitch = 0.8f + (podSpeed / 180f) * 0.4f;
+            //sources[3].pitch = 0.8f + (podSpeed / 100f) * 0.4f;
             sources[1].volume = 1f - Mathf.Max(-0.5f + podSpeed / 85f, 0.0f);
             //sources[2].volume = Mathf.Max(- 0.5f + podSpeed / 90f,0.2f);
-            sources[2].volume = Mathf.Max(-0.5f + (enginePowerR + enginePowerL) / 10f, 0.2f);
+            sources[2].volume = Mathf.Max(-0.5f + (enginePowerR + enginePowerL) / 5f, 0.2f);
 
             // WIND PERTUBATION SFX CALC
             //TODO volume perturb = speed * angle
@@ -209,9 +212,21 @@ public class SFX_Controller : MonoBehaviour
 
             UpdateHUDDebugger();
             UpdateCockpitUI();
-
+            UpdateReactors();
+            var chromatic = postprocess.chromaticAberration.settings;
+            chromatic.intensity = Mathf.Clamp01(podSpeed / 60f);
         }
     }
+
+    public void UpdateReactors()
+    {
+        LeftReactor.podSpeed = RightReactor.podSpeed = lastvelocity;
+        //SPOON OPENING
+        LeftReactor.reactorPower = enginePowerL;
+        RightReactor.reactorPower = enginePowerR;
+
+    }
+
     void UpdateCockpitUI()
     {
         podui.powerimg_l.fillAmount = enginePowerL;
@@ -265,7 +280,7 @@ public class SFX_Controller : MonoBehaviour
             //VIRAGE VELOCITEE
             //STABILISATEUR ASSIETTE.
             Quaternion hoverQuat = Quaternion.LookRotation(hoverDirection, hoverUp);
-            print(hoverQuat.eulerAngles);
+            //print(hoverQuat.eulerAngles);
             transform.localRotation = Quaternion
                 .Lerp(transform.localRotation
                 , hoverQuat//(hoverDirection, hoverUp) 
@@ -286,13 +301,6 @@ public class SFX_Controller : MonoBehaviour
             }
             lastvelocity = body.velocity.sqrMagnitude;
 
-            //SPOON OPENING
-            spoon_left_top.transform.localEulerAngles = new Vector3((1f - Mathf.Min(enginePowerL, 1f)) * spoon_opening_mult, 0, 0);   //+ UnityEngine.Random.Range(-0.1f, 0.1f)
-            spoon_left_downleft.transform.localEulerAngles = new Vector3((1f - Mathf.Min(enginePowerL, 1f)) * spoon_opening_mult, 0, 0);  //+ UnityEngine.Random.Range(-0.1f, 0.1f)
-            spoon_left_downright.transform.localEulerAngles = new Vector3((1f - Mathf.Min(enginePowerL, 1f)) * spoon_opening_mult, 0, 0); //+ UnityEngine.Random.Range(-0.1f, 0.1f)
-            spoon_right_top.transform.localEulerAngles = new Vector3((1f - Mathf.Min(enginePowerR, 1f)) * spoon_opening_mult, 0, 0);   //+ UnityEngine.Random.Range(-0.1f, 0.1f)
-            spoon_right_downleft.transform.localEulerAngles = new Vector3((1f - Mathf.Min(enginePowerR, 1f)) * spoon_opening_mult, 0, 0);  //+ UnityEngine.Random.Range(-0.1f, 0.1f)
-            spoon_right_downright.transform.localEulerAngles = new Vector3((1f - Mathf.Min(enginePowerR, 1f)) * spoon_opening_mult, 0, 0); //+ UnityEngine.Random.Range(-0.1f, 0.1f)
         }
     }
 
@@ -305,7 +313,11 @@ public class SFX_Controller : MonoBehaviour
         podSpeed_target = 0;
         podRotation = 0;
         podRotation_target = 0;
-
+        //
+        foreach (var l in LightningAnimation) l.SetActive(true);
+        //
+        RightReactor.startReactor();
+        LeftReactor.startReactor();
         //
         sources[1].clip = clips[1];
         sources[1].loop = true;
@@ -322,6 +334,12 @@ public class SFX_Controller : MonoBehaviour
         sources[3].volume = 0.2f;
         sources[3].pitch = 0.9f;
         sources[3].Play();
+        //
+        sources[4].clip = clips[8];
+        sources[4].loop = true;
+        sources[4].volume = 0.2f;
+        sources[4].pitch = 0.9f;
+        sources[4].Play();
     }
     public void Engine_Shutdown()
     {
@@ -331,7 +349,11 @@ public class SFX_Controller : MonoBehaviour
         podSpeed_target = 0;
         podRotation = 0;
         podRotation_target = 0;
-
+        //
+        foreach (var l in LightningAnimation) l.SetActive(false);
+        //
+        RightReactor.shutdownReactor();
+        LeftReactor.shutdownReactor();
         //
         sources[1].loop = false;
         sources[1].Stop();
@@ -343,6 +365,10 @@ public class SFX_Controller : MonoBehaviour
         sources[3].loop = false;
         sources[3].Stop();
         sources[3].volume = 0.15f;
+        //
+        sources[4].loop = false;
+        sources[4].Stop();
+        sources[4].volume = 0.15f;
     }
 
     public static bool keyStartButtonDown()
