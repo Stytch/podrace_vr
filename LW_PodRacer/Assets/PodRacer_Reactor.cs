@@ -5,7 +5,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class PodRacer_Reactor : MonoBehaviour
 {
-    public bool started;
+    private bool started;
     public float scoups_opening_mult = -10f;
     public float reactorPower;
     public float podSpeed;
@@ -13,6 +13,11 @@ public class PodRacer_Reactor : MonoBehaviour
     public float sideshutter_opening_mult = -30f;
     public float light_powermin = 50f;
     public float light_powermax = 150f;
+    public float boosting_value;
+    //BRAKES
+    public bool isBreaking = false;
+    public float breakingValue = 0;
+    public float ScoupsBreakingSpeed = 20f;
 
     public Light reactorLight;
     public Light lightningLight;
@@ -22,11 +27,12 @@ public class PodRacer_Reactor : MonoBehaviour
     public GameObject[] shuttersRoots;
     public GameObject[] scoupsRoots;
     public GameObject[] sideShutterRoots;
+    public GameObject[] blacksmokes;
 
-    public Color lowSpeedColor_min;
-    public Color lowSpeedColor_max;
-    public Color highSpeedColor_min;
-    public Color highSpeedColor_max;
+    public Color normalRColor_min = new Color(255,169,0);
+    public Color normalRColor_max= new Color(255,245,0);
+    public Color boostRColor_min = new Color(0, 255,237);
+    public Color boostRColor_max = new Color(0, 255, 148);
 
     void Start()
     {
@@ -40,10 +46,12 @@ public class PodRacer_Reactor : MonoBehaviour
         reactorFlameParticles.gameObject.SetActive(false);
         reactorFlameStartingParticles.gameObject.SetActive(false);
         started = false;
-        reactorLight.color = lowSpeedColor_min;
+        reactorLight.color = normalRColor_min;
         reactorLight.intensity = 0;
         reactorFlameStartingParticles.Clear();
         reactorFlameStartingParticles.Stop();
+        isBreaking = false;
+        foreach (var item in blacksmokes) item.SetActive(false);
 
     }
 
@@ -61,7 +69,7 @@ public class PodRacer_Reactor : MonoBehaviour
         started = true;
         reactorFlameParticles.gameObject.SetActive(true);
         reactorLight.intensity = light_powermin;
-        reactorLight.color = lowSpeedColor_min;
+        reactorLight.color = normalRColor_min;
     }
 
     public void Update()
@@ -70,10 +78,10 @@ public class PodRacer_Reactor : MonoBehaviour
         {
             Vector3 tmp;
 
-            //SCOUPS
-            tmp = new Vector3(Mathf.Clamp01(1f - Mathf.Min(reactorPower, 1f)) * scoups_opening_mult, 0, 0);
+            //BREAKING SCOUPS
+            breakingValue = Mathf.Lerp(breakingValue, (isBreaking?1f:0f), Time.deltaTime * ScoupsBreakingSpeed);
+            tmp = new Vector3(breakingValue * scoups_opening_mult, 0, 0);
             for (int i = 0; i < scoupsRoots.Length; i++) scoupsRoots[i].transform.localEulerAngles = tmp;
-            //spoon_left_top.transform.localEulerAngles = new Vector3((1f - Mathf.Min(enginePowerL, 1f)) * spoon_opening_mult, 0, 0);   //+ UnityEngine.Random.Range(-0.1f, 0.1f)
 
             //SHUTTERS
             tmp = new Vector3((reactorPower) * shutter_opening_mult, 0, 0);
@@ -86,15 +94,15 @@ public class PodRacer_Reactor : MonoBehaviour
             //PARTICLES
             var main = reactorFlameParticles.main;
             main.startSize = new ParticleSystem.MinMaxCurve(0.02f + Mathf.Clamp01(reactorPower) * 0.03f);
-            main.startLifetime = new ParticleSystem.MinMaxCurve(0.2f + Mathf.Clamp01(reactorPower) * 0.4f);
+            main.startLifetime = new ParticleSystem.MinMaxCurve(0.3f + Mathf.Clamp01(reactorPower) * 0.2f);
             var gradient = new ParticleSystem.MinMaxGradient(
-                Color.Lerp(lowSpeedColor_min, highSpeedColor_min, reactorPower)
-                , Color.Lerp(lowSpeedColor_max, highSpeedColor_max, reactorPower));
+                Color.Lerp(normalRColor_min, boostRColor_min, boosting_value)
+                , Color.Lerp(normalRColor_max, boostRColor_max, boosting_value));
             main.startColor = gradient;
 
             //LIGHT
             reactorLight.intensity = light_powermin +(reactorPower) * light_powermax * Random.Range(0.5f,1f);
-            reactorLight.color = Color.Lerp(lowSpeedColor_min, highSpeedColor_min, reactorPower);
+            reactorLight.color = Color.Lerp(normalRColor_min, boostRColor_min, boosting_value);
         }
     }
 }

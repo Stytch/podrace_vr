@@ -21,7 +21,7 @@ public class SliderSetting : MonoBehaviour
     void Awake()
     {
         _slider.interactable = _canSet;
-        SFX_Controller.dict_Sliders[gameObject.name] = this;
+        //SFX_Controller.dict_Sliders[gameObject.name] = this;
         _name.text = gameObject.name;
         _slider.onValueChanged.AddListener(delegate { setValue(_slider.value); });
     }

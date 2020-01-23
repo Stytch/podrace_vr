@@ -10,7 +10,6 @@ public class SFX_Controller : MonoBehaviour
     [Header("SFX_Ressources")]
     public AudioClip[] clips;
     public AudioSource[] sources;
-    public static Dictionary<string, SliderSetting> dict_Sliders = new Dictionary<string, SliderSetting>();
 
     [Header("SFX_Engine_Physics")]
     public Rigidbody body;
@@ -21,15 +20,16 @@ public class SFX_Controller : MonoBehaviour
     public float body_inclinaison_maxangle = 45f;
     public float body_hover_height = 4f;
 
-
-    [Header("Reactors")]
+    [Header("SCRIPT_Reactors")]
     public PodRacer_Reactor LeftReactor;
     public PodRacer_Reactor RightReactor;
 
-    [Header("Lightning")]
+    [Header("VFX_Lightning")]
     public GameObject[] LightningAnimation;
+    public Light[] LightningLight;
     //public Light LightningLight;
 
+    [Header("VFX_PostProcess")]
     public PostProcessingProfile postprocess;
 
     [Header("SFX_Engine_Power")]
@@ -41,35 +41,45 @@ public class SFX_Controller : MonoBehaviour
     /// 4 : Deceleration
     /// 5 : Acceleration
     /// </summary>
-    public int engineState = 0;
-
-    //public int engineFlags;//-------------------------------//todo
-
+    private int engineState = 0;
     /// <summary>
     /// 0-0 : stable
     /// 0-1 : accelaration 
     /// 1-2 : overboosting
     /// </summary>
-    public float enginePowerL = 0;
-    public float enginePowerR = 0;
-    public float enginePowerBoostAddition = 0.5f;
-    public float enginePowerAcceleration = 5f;
-    public float enginePowerDeceleration = 5f;
-    public float podDamage = 0;
+    private float enginePowerL = 0;
+    private float enginePowerR = 0;
 
     [Header("INPUT_Direction")]
-    public float podRotation = 0;
-    public float podRotation_target = 0;
-    public float podRotation_variation = 5f;
+    private float rotation = 0;
+    private float rotation_target = 0;
+    public float rotation_variation = 5f;
 
     [Header("INPUT_Speed")]
-    public float podSpeed = 0;
-    public float podSpeed_target = 0;
-    public float podSpeed_variation = 0.333f;
+    private float speed_value = 0;
+    private float speed_target = 0;
+    public float speed_timeVariationSec = 3f;
+    public float speed_acceleration = 2f;
+    public float speed_deceleration = 2f;
+
+    [Header("INPUT_Brake")]
+    private bool breaking = false;
+
+    [Header("INPUT_Boosting")]
+    private bool boosting = false;
+    private float boosting_value = 0f;
+    public float boosting_timeVariationSec = 3f;
+    public float boosting_power = 0.5f;
+    private float boosting_duration = 0f;
+    public float boosting_durationLimitSec = 5f;
+    private bool boosting_disabled = false;
+    private float boosting_disable_duration = 0f;
+    public float boosting_disable_durationLimitSec = 5f;
 
     [Header("SFX_Pertubations_effect")]
-    public float perturbator_wind = 0;
-    public float perturbator_canyonreverb = 0;
+    public bool invulnerable = false;
+    public float invulnerable_duration = 0;
+    public float invulnerable_durationLimitSec = 5f;
 
     [Header("SFX_Durations")]
     public float duration_engine_starting = 5f;
@@ -77,53 +87,58 @@ public class SFX_Controller : MonoBehaviour
     public float duration_engine_acceleratorStrike = 2f;
     public float duration_engine_decelerationStrike = 2f;
 
-    [Header("HUD_DEBUGGER")]
-    public bool useKeyboard = true;
-    public Image dir;
-    public Text angle;
-    public Text speed;
-    public Text velocity;
-    public Text damage;
-
     [Header("UI_COCKPIT")]
-    public PodRacer_UI podui;
+    public PodRacer_UI ui;
+
+    LayerMask terrainMask;
+    PostProcessingProfile ppProfile;
+    private int lives;
+    public int lives_start = 3;
+    //public bool disableInputs;
 
     private void Awake()
     {
         terrainMask = LayerMask.GetMask("Terrain");
-
     }
-
     void Start()
     {
-        dict_Sliders["Power_L"].initSettingView(0, 2, 0);
-        //dict_Sliders["Power_L"].AddListener_OnValueChanged(() => { print("Power_L is changed in UI"); });
-        dict_Sliders["Power_R"].initSettingView(0, 2, 0);
-        //dict_Sliders["Power_R"].AddListener_OnValueChanged(() => { print("Power_R is changed in UI"); });
-
+        set_ChromaticAberrationValue(0f);
+        ppProfile = Camera.main.GetComponent<PostProcessingBehaviour>().profile;
+        breaking = false;
+        boosting_value = 0;
+        reset_UI();
+        lives = lives_start;
+        update_UI_lives();
     }
+
     private float lastvelocity = 0.0f;
     private float lastPower = 0.0f;
     private float nextSFX_slowing = 0.0f;
     private float nextSFX_Heavyslowing = 0.0f;
     private float nextSFX_accelerating = 0.0f;
+
+    // LES CONTROLES
+    private bool input_RESET { get => Input.GetKeyDown(KeyCode.KeypadMultiply) || Input.GetButtonDown("joystick button 6"); }
+    private bool input_BOOSTING { get => (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5")) || Input.GetKey(KeyCode.Keypad3); }
+    private bool input_BREAKING { get => (Input.GetKey(KeyCode.KeypadPlus) || Input.GetKey("joystick button 3")); }
+    private bool input_SWITCHPOWER { get => (Input.GetKeyDown(KeyCode.Keypad0) || Input.GetButtonDown("joystick button 7")); }
+    private float input_POWER_LEFT { get => (Input.GetKey(KeyCode.Keypad2) ? 1f : 0) + Input.GetAxis("LT"); }
+    private float input_POWER_RIGHT { get => (Input.GetKey(KeyCode.Keypad1) ? 1f : 0) + Input.GetAxis("RT"); }
+
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.KeypadMultiply) || Input.GetButtonDown("joystick button 6"))
+        /* --- BASIC INPUTS ----------*/
+        if (input_RESET)
         {
-            print("reset !");
-            transform.position = Vector3.zero;
-            transform.localEulerAngles = Vector3.zero;
-            podSpeed = 0f;
+            reset_Podracer();
         }
-
-        if ((Input.GetKeyDown(KeyCode.Keypad0) || Input.GetButtonDown("joystick button 7")) && engineState == 0)
+        if (input_SWITCHPOWER && engineState == 0)
         {
             print("Engine_Start");
             sources[0].PlayOneShot(clips[0]);
             Invoke("Engine_Start", duration_engine_starting);
         }
-        else if ((Input.GetKeyDown(KeyCode.Keypad0) || Input.GetButtonDown("joystick button 7")) && engineState == 1)
+        else if (input_SWITCHPOWER && engineState == 1)
         {
             print("Engine_Shutdown");
             sources[0].PlayOneShot(clips[7]);
@@ -132,127 +147,145 @@ public class SFX_Controller : MonoBehaviour
 
         if (engineState > 0)
         {
-            //INPUTS [KEYMODE]
-            if (useKeyboard)
-            {
+            /* --- UPDATE BOOSTING ----------*/
+            update_Boosting();
+            /* --- UPDATE BREAKING INPUT ----------*/
+            breaking = input_BREAKING;
+            /* --- UPDATE POWER INPUT ----------*/
+            enginePowerL = Mathf.Lerp(
+                enginePowerL
+                , input_POWER_LEFT + boosting_value * boosting_power
+                , Time.deltaTime * speed_acceleration);
+            enginePowerR = Mathf.Lerp(
+                enginePowerR
+                , input_POWER_RIGHT + boosting_value * boosting_power
+                , Time.deltaTime * speed_acceleration);
 
-                if (Input.GetKey(KeyCode.Keypad1))
-                {
-                    enginePowerL = Mathf.Lerp(enginePowerL, 1f + (Input.GetKey(KeyCode.Keypad3) ? enginePowerBoostAddition : 0f), Time.deltaTime * enginePowerAcceleration);
-                }
-                else
-                {
-                    enginePowerL = Mathf.Lerp(enginePowerL, 0, Time.deltaTime * enginePowerDeceleration);
-                }
-
-                if (Input.GetKey(KeyCode.Keypad2))
-                {
-                    enginePowerR = Mathf.Lerp(enginePowerR, 1f + (Input.GetKey(KeyCode.Keypad3) ? enginePowerBoostAddition : 0f), Time.deltaTime * enginePowerAcceleration);
-                }
-                else
-                {
-                    enginePowerR = Mathf.Lerp(enginePowerR, 0, Time.deltaTime * enginePowerDeceleration);
-                }
-
-
-                if (Input.GetKey(KeyCode.Keypad3) && Time.timeSinceLevelLoad > nextSFX_accelerating)
-                {
-                    sources[0].PlayOneShot(clips[6]);
-                    nextSFX_accelerating = Time.timeSinceLevelLoad + 10f;
-                }
-            }
-            else // BY XBOX CONTROLLER
-            {
-                enginePowerL = Mathf.Lerp(enginePowerL,
-                    (Input.GetKey(KeyCode.Keypad2) ? 1 : 0)
-                    + Input.GetAxis("LT")
-                    + (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5") ? enginePowerBoostAddition : 0f)
-                    , Time.deltaTime * enginePowerAcceleration * 2);
-                enginePowerR = Mathf.Lerp(enginePowerR,
-                    (Input.GetKey(KeyCode.Keypad1) ? 1 : 0)
-                    + Input.GetAxis("RT")
-                    + (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5") ? enginePowerBoostAddition : 0f)
-                    , Time.deltaTime * enginePowerAcceleration * 2);
-                if (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5") && Time.timeSinceLevelLoad > nextSFX_accelerating)
-                {
-                    sources[0].PlayOneShot(clips[6]);
-                    nextSFX_accelerating = Time.timeSinceLevelLoad + 10f;
-                }
-            }
-
-            // DIRECTION CALC
-            float dirRatio = enginePowerR - enginePowerL;
-            if (Math.Abs(dirRatio) < 0.1f)
-            {
-                //podRotation_target = 0f;
-                podRotation_target = dirRatio;
-            }
-            else
-            {
-                podRotation_target = dirRatio;
-            }
-            podRotation = Mathf.Lerp(podRotation, podRotation_target, Time.deltaTime * podRotation_variation);
-
-            //SPEED CALC // MAXSPEED = 100f
-            podSpeed_target = (float)(Math.Pow((enginePowerR + enginePowerL), 2) * 25d);
-            podSpeed = Mathf.Lerp(podSpeed, podSpeed_target, Time.deltaTime * podSpeed_variation);
-            sources[1].pitch = 0.8f + (podSpeed / 180f) * 0.3f;
-            sources[3].pitch = 0.9f + (podSpeed / 180f) * 0.2f;
-            sources[4].pitch = 0.8f + (podSpeed / 180f) * 0.4f;
-            //sources[3].pitch = 0.8f + (podSpeed / 100f) * 0.4f;
-            sources[1].volume = 1f - Mathf.Max(-0.5f + podSpeed / 85f, 0.0f);
-            //sources[2].volume = Mathf.Max(- 0.5f + podSpeed / 90f,0.2f);
-            sources[2].volume = Mathf.Max(-0.5f + (enginePowerR + enginePowerL) / 5f, 0.2f);
-
-            // WIND PERTUBATION SFX CALC
-            //TODO volume perturb = speed * angle
-
-            // ENGINE SFX CALC
-            //TODO 
-
-            UpdateHUDDebugger();
-            UpdateCockpitUI();
-            UpdateReactors();
-            var chromatic = postprocess.chromaticAberration.settings;
-            chromatic.intensity = Mathf.Clamp01(podSpeed / 60f);
+            /* --- UPDATE POD_PHYSICS ----------*/
+            update_PodDirection();
+            update_PodSpeed();
+            update_Invulnerable();
+            /* --- UPDATE SFX ------------------*/
+            updateSFX_Reactors();
+            updateSFX_Boosting();
+            /* --- UPDATE COMPONENTS -----------*/
+            updateSCRIPT_Reactors();
+            /* --- UPDATE UI ------------------*/
+            update_UI_Cockpit();
+            update_UI_distanceTempete();
+            update_UI_surchauffe();
         }
     }
+    void update_UI_surchauffe()
+    {
+        ui.img_boost.fillAmount = Mathf.Clamp01(boosting_duration / boosting_durationLimitSec);
+    }
+    void update_Invulnerable()
+    {
+        if (invulnerable)
+        {
+            invulnerable_duration += Time.deltaTime;
+            if (invulnerable_duration > invulnerable_durationLimitSec)
+            {
+                invulnerable = false;
+                invulnerable_duration = 0f;
+            }
+        }
+    }
+    void update_Boosting()
+    {
+        // SET BOOSTING
+        boosting = input_BOOSTING && !boosting_disabled;
+        boosting_value = Mathf.Lerp(boosting_value, (boosting ? 1f : 0f), Time.deltaTime);
+        if (boosting) boosting_duration += Time.deltaTime;
+        if (boosting_disabled) boosting_disable_duration += Time.deltaTime;
+        //SURCHARGE
+        if (boosting && boosting_duration > boosting_durationLimitSec)
+        {
+            print("SURCHARGE");
+            ApplyDamage(false);
+            boosting_disabled = true;
+            boosting_duration = 0f;
+        }
+        else if (boosting_disabled && boosting_disable_duration > boosting_disable_durationLimitSec)
+        {
+            print("BOOST DISPO");
+            boosting_disabled = false;
+            boosting_disable_duration = 0f;
+        }
+    }
+    void update_PodDirection()
+    {
+        // DIRECTION CALC
+        float dirRatio = enginePowerR - enginePowerL;
+        rotation_target = dirRatio;
+        rotation = Mathf.Lerp(rotation, rotation_target, Time.deltaTime * rotation_variation);
+    }
+    void update_PodSpeed()
+    {
+        //SPEED CALC // MAXSPEED = 100f
+        speed_target = (float)(Math.Pow((enginePowerR + enginePowerL), 2) * 25d) * (breaking ? -0.25f : 1f);
+        speed_value = Mathf.Lerp(speed_value, speed_target, Time.deltaTime / speed_timeVariationSec);
+    }
+    void updateSFX_Reactors()
+    {
+        sources[1].pitch = 0.8f + (speed_value / 180f) * 0.3f;
+        sources[3].pitch = 0.9f + (speed_value / 180f) * 0.2f;
+        sources[4].pitch = 0.8f + (speed_value / 180f) * 0.4f;
+        //sources[3].pitch = 0.8f + (podSpeed / 100f) * 0.4f;
+        sources[1].volume = 1f - Mathf.Max(-0.5f + speed_value / 85f, 0.0f);
+        //sources[2].volume = Mathf.Max(- 0.5f + podSpeed / 90f,0.2f);
+        sources[2].volume = Mathf.Max(-0.5f + (enginePowerR + enginePowerL) / 5f, 0.2f);
 
-    public void UpdateReactors()
+        // WIND PERTUBATION SFX CALC
+        //TODO volume perturb = speed * angle
+    }
+    void updateSFX_Boosting()
+    {
+        if (input_BOOSTING && Time.timeSinceLevelLoad > nextSFX_accelerating)
+        {
+            sources[0].PlayOneShot(clips[6]);
+            nextSFX_accelerating = Time.timeSinceLevelLoad + 10f;
+        }
+    }
+    void updateSCRIPT_Reactors()
     {
         LeftReactor.podSpeed = RightReactor.podSpeed = lastvelocity;
         //SPOON OPENING
         LeftReactor.reactorPower = enginePowerL;
         RightReactor.reactorPower = enginePowerR;
+        LeftReactor.isBreaking = breaking;
+        RightReactor.isBreaking = breaking;
+        RightReactor.boosting_value = boosting_value;
+        LeftReactor.boosting_value = boosting_value;
 
     }
+    void update_UI_Cockpit()
+    {
+        ui.powerimg_l.fillAmount = enginePowerL;
+        ui.powerimg_r.fillAmount = enginePowerR;
+        ui.text_dir.text = (rotation * 90f).ToString("F") + "°";
+        ui.text_spd.text = speed_value.ToString("F") + "m/s";
 
-    void UpdateCockpitUI()
-    {
-        podui.powerimg_l.fillAmount = enginePowerL;
-        podui.powerimg_r.fillAmount = enginePowerR;
-        podui.text_dir.text = (podRotation * 90f).ToString("F") + "°";
-        podui.text_spd.text = podSpeed.ToString("F") + "m/s";
     }
-    //private void FixedUpdate()
-    void UpdateHUDDebugger()
+    void update_UI_lives()
     {
-        // UPDATE HUD
-        dir.transform.localRotation = Quaternion.Euler(0, 0, (podRotation * 90f));
-        angle.text = (podRotation * 90f).ToString("F") + "°";
-        speed.text = podSpeed.ToString("F") + "m/s";
-        dict_Sliders["Power_L"].setValue(enginePowerL);
-        dict_Sliders["Power_R"].setValue(enginePowerR);
-        velocity.text = body.velocity.ToString();
+        ui.text_vie.text = lives.ToString() + " vie" + (lives < 0 ? "" : "s");
+        ui.img_feu.fillAmount = 1f - Mathf.Clamp01((lives) / (float)lives_start);
     }
-    private LayerMask terrainMask;
+    void update_UI_distanceTempete()
+    {
+        ui.text_tempete.text = 0f.ToString() + "mètres";
+        ui.img_tempete.fillAmount = 0f; ;
+    }
+
     private void FixedUpdate()
     {
         if (engineState > 0)
         {
             //CONSTANT REDUCTION FORCE
             body.velocity = new Vector3(body.velocity.x, body.velocity.y, body.velocity.z) * 0.9f;
-            body.angularVelocity = new Vector3(body.angularVelocity.x, body.angularVelocity.y + podRotation * -body_rotation_mult, body.angularVelocity.z) * 0.9f;
+            body.angularVelocity = new Vector3(body.angularVelocity.x, body.angularVelocity.y + rotation * -body_rotation_mult, body.angularVelocity.z) * 0.9f;
 
             //HOVERCRAFT FORCE
             RaycastHit hit;
@@ -275,16 +308,17 @@ public class SFX_Controller : MonoBehaviour
             }
 
             //SPEED BY ENGINE FORCE
-            body.AddForce((transform.forward * podSpeed * body_speed_mult), ForceMode.Force);// + (Vector3.up * podSpeed)
+            body.AddForce((transform.forward * speed_value * body_speed_mult), ForceMode.Force);// + (Vector3.up * podSpeed)
 
             //VIRAGE VELOCITEE
             //STABILISATEUR ASSIETTE.
             Quaternion hoverQuat = Quaternion.LookRotation(hoverDirection, hoverUp);
             //print(hoverQuat.eulerAngles);
             transform.localRotation = Quaternion
-                .Lerp(transform.localRotation
+                .Lerp(
+                transform.localRotation
                 , hoverQuat//(hoverDirection, hoverUp) 
-                    * (Quaternion.Euler(0, 0, (podRotation_target * body_inclinaison_maxangle) - transform.localEulerAngles.z))
+                    * (Quaternion.Euler(0, 0, (rotation_target * body_inclinaison_maxangle) - transform.localEulerAngles.z))
                 , body_stabilisator_mult);
 
             //DECELERATION DETECTION
@@ -301,23 +335,39 @@ public class SFX_Controller : MonoBehaviour
             }
             lastvelocity = body.velocity.sqrMagnitude;
 
+
+            //CHROMATIC ABERRATION / SPEED
+            set_ChromaticAberrationValue((speed_value - 80f) / 80f);
+
+            //LIGHTNING LIGHT INTENSITY
+            foreach (var l in LightningLight) l.intensity = UnityEngine.Random.Range(0.5f, 1f) * 36f;
         }
     }
 
-
+    public void set_ChromaticAberrationValue(float intensity)
+    {
+        if (ppProfile == null) return;
+        ChromaticAberrationModel.Settings chromaticSettings = ppProfile.chromaticAberration.settings;
+        chromaticSettings.intensity = Mathf.Clamp01(intensity);
+        ppProfile.chromaticAberration.settings = chromaticSettings;
+    }
     public void Engine_Start()
     {
         print("Engine ON");
         engineState = 1;
-        podSpeed = 0;
-        podSpeed_target = 0;
-        podRotation = 0;
-        podRotation_target = 0;
+        speed_value = 0;
+        speed_target = 0;
+        rotation = 0;
+        rotation_target = 0;
         //
         foreach (var l in LightningAnimation) l.SetActive(true);
+        foreach (var l in LightningLight) l.gameObject.SetActive(true);
+        set_ChromaticAberrationValue(0f);
+        breaking = false;
         //
         RightReactor.startReactor();
         LeftReactor.startReactor();
+        reset_EnginePower();
         //
         sources[1].clip = clips[1];
         sources[1].loop = true;
@@ -345,15 +395,18 @@ public class SFX_Controller : MonoBehaviour
     {
         print("Engine OFF");
         engineState = 0;
-        podSpeed = 0;
-        podSpeed_target = 0;
-        podRotation = 0;
-        podRotation_target = 0;
+        speed_value = 0;
+        speed_target = 0;
+        rotation = 0;
+        rotation_target = 0;
         //
         foreach (var l in LightningAnimation) l.SetActive(false);
+        foreach (var l in LightningLight) l.gameObject.SetActive(false);
+        set_ChromaticAberrationValue(0f);
         //
         RightReactor.shutdownReactor();
         LeftReactor.shutdownReactor();
+        reset_EnginePower();
         //
         sources[1].loop = false;
         sources[1].Stop();
@@ -369,11 +422,78 @@ public class SFX_Controller : MonoBehaviour
         sources[4].loop = false;
         sources[4].Stop();
         sources[4].volume = 0.15f;
+        breaking = false;
     }
-
-    public static bool keyStartButtonDown()
+    public void ApplyDamage(bool resetVelocityAndPower)
     {
-        return Input.GetKeyDown(KeyCode.Keypad0);
-        //return Input.GetKeyDown(KeyCode.Keypad0) || Input.get;
+        if (invulnerable) return;
+
+        print($"OnCollisionEnter : {--lives} lives");
+        if (lives == 0) game_gameover();
+        if (resetVelocityAndPower)
+        {
+            reset_PodracerVelocity();
+            reset_EnginePower();
+        }
+        update_UI_lives();
+    }
+    public void game_gameover()
+    {
+        print("game_gameover");
+    }
+    public void game_win()
+    {
+        print("game_win");
+
+    }
+    private void OnApplicationQuit()
+    {
+        set_ChromaticAberrationValue(0f);
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (engineState > 0)
+        {
+            ApplyDamage(true);
+        }
+    }
+    //private void OnCollisionExit(Collision collision)
+
+
+
+    private void reset_UI()
+    {
+        ui.img_boost.fillAmount = 0f;
+        ui.img_feu.fillAmount = 0f;
+        ui.img_tempete.fillAmount = 0f;
+
+        ui.text_dir.text = "-";
+        ui.text_spd.text = "-";
+        ui.text_tempete.text = "-";
+        ui.text_vie.text = "-";
+
+        ui.powerimg_l.fillAmount = 0f;
+        ui.powerimg_r.fillAmount = 0f;
+    }
+    private void reset_EnginePower()
+    {
+        enginePowerL = 0f;
+        enginePowerR = 0f;
+    }
+    private void reset_PodracerVelocity()
+    {
+        body.velocity = Vector3.zero;
+        body.angularVelocity = Vector3.zero;
+        speed_value = 0f;
+    }
+    private void reset_Podracer()
+    {
+        print("resetPodracer !");
+        transform.position = Vector3.zero;
+        transform.localEulerAngles = Vector3.zero;
+        reset_PodracerVelocity();
+        reset_EnginePower();
+        breaking = false;
+        lives = lives_start;
     }
 }
