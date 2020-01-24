@@ -6,8 +6,8 @@ using UnityEngine.UIElements;
 public class MenuController : MonoBehaviour
 {
 
-    public GameObject MenuButton;
-    public GameObject Canvas;
+    public GameObject MenuButton;       //Contains the Prefab MenuButton, used to create buttons while opening menus
+    public GameObject Canvas;           //Contains the Parent used when Instantiating Menu Buttons
 
     void Start()
     {
@@ -19,24 +19,63 @@ public class MenuController : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Launches the game (still needs work)
+    /// Doesn't take any argument, doesn't return anything
+    /// Called by MenuButtonController
+    /// </summary>
     public void OnPlayButton()
     {
         //On lance le jeu
         Debug.Log("PlayButton Pressed");
     }
 
+    /// <summary>
+    /// Opens the Option Menu
+    /// Doesn't take any argument, doesn't return anything
+    /// Called by MenuButtonController
+    /// </summary>
     public void OnOptionButton()
     {
         //On ouvre le menu des options
         Debug.Log("OptionButton Pressed");
     }
 
+    /// <summary>
+    /// Quits the game totally
+    /// Doesn't take any argument, doesn't return anything
+    /// Called by MenuButtonController
+    /// </summary>
     public void OnQuitButton()
     {
         Debug.Log("QuitButton Pressed");
         Application.Quit();
     }
 
+    /// <summary>
+    /// Resumes the current game
+    /// Doesn't take any argument, doesn't return anything
+    /// Called by MenuButtonController
+    /// </summary>
+    public void OnResumeButton()
+    {
+        Debug.Log("ResumeButton Pressed");
+    }
+
+    /// <summary>
+    /// Goes back to Main Menu
+    /// Doesn't take any argument, doesn't return anything
+    /// Called by MenuButtonController
+    /// </summary>
+    public void OnMenuButton()
+    {
+        Debug.Log("MenuButton Pressed");
+    }
+
+    /// <summary>
+    /// Open the Main Menu
+    /// Doesn't take any argument, doesn't return anything
+    /// </summary>
     public void OpenMainMenu()
     {
         GameObject PlayButton = Instantiate(MenuButton, Canvas.transform);
@@ -55,6 +94,10 @@ public class MenuController : MonoBehaviour
         QuitButton.GetComponent<MenuButtonController>().ButtonText = "Quit";
     }
 
+    /// <summary>
+    /// Open the Menu while pausing (doesn't pause the game yet)
+    /// Doesn't take any argument, doesn't return anything
+    /// </summary>
     public void OpenPauseMenu()
     {
         GameObject PlayButton = Instantiate(MenuButton, Canvas.transform);
@@ -73,6 +116,10 @@ public class MenuController : MonoBehaviour
         QuitButton.GetComponent<MenuButtonController>().ButtonText = "Quit to Menu";
     }
 
+    /// <summary>
+    /// Open the Menu after a death or winning the game
+    /// Doesn't take any argument, doesn't return anything
+    /// </summary>
     public void OpenDeathMenu()
     {
         GameObject PlayButton = Instantiate(MenuButton, Canvas.transform);
