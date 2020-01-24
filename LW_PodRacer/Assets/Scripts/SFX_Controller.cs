@@ -62,7 +62,6 @@ public class SFX_Controller : MonoBehaviour
     public float speed_acceleration = 2f;
     public float speed_deceleration = 2f;
 
-    [Header("INPUT_Brake")]
     private bool breaking = false;
 
     [Header("INPUT_Boosting")]
@@ -121,6 +120,7 @@ public class SFX_Controller : MonoBehaviour
     private bool input_RESET { get => Input.GetKeyDown(KeyCode.KeypadMultiply) || Input.GetButtonDown("joystick button 6"); }
     private bool input_BOOSTING { get => (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5")) || Input.GetKey(KeyCode.Keypad3); }
     private bool input_BREAKING { get => (Input.GetKey(KeyCode.KeypadPlus) || Input.GetKey("joystick button 3")); }
+    private bool input_BREAKING_down { get => (Input.GetKeyDown(KeyCode.KeypadPlus) || Input.GetKeyDown("joystick button 3")); }
     private bool input_SWITCHPOWER { get => (Input.GetKeyDown(KeyCode.Keypad0) || Input.GetButtonDown("joystick button 7")); }
     private float input_POWER_LEFT { get => (Input.GetKey(KeyCode.Keypad2) ? 1f : 0) + Input.GetAxis("LT"); }
     private float input_POWER_RIGHT { get => (Input.GetKey(KeyCode.Keypad1) ? 1f : 0) + Input.GetAxis("RT"); }
@@ -147,6 +147,8 @@ public class SFX_Controller : MonoBehaviour
 
         if (engineState > 0)
         {
+            if (Input.GetKeyDown(KeyCode.KeypadMinus)) ApplyDamage(true);
+            if (input_BREAKING_down) sources[0].PlayOneShot(clips[9]);
             /* --- UPDATE BOOSTING ----------*/
             update_Boosting();
             /* --- UPDATE BREAKING INPUT ----------*/
@@ -189,15 +191,22 @@ public class SFX_Controller : MonoBehaviour
             {
                 invulnerable = false;
                 invulnerable_duration = 0f;
+                print("invulnerable is OFF");
             }
         }
     }
+    bool boosting_old = false;
     void update_Boosting()
     {
         // SET BOOSTING
         boosting = input_BOOSTING && !boosting_disabled;
-        boosting_value = Mathf.Lerp(boosting_value, (boosting ? 1f : 0f), Time.deltaTime);
+        boosting_value = Mathf.Lerp(boosting_value, (boosting ? 1f : 0f), Time.deltaTime / boosting_timeVariationSec);
+        // SFX BOOST
+        if(!boosting && boosting_old) sources[0].PlayOneShot(clips[10]);
+        // GESTION DUREE BOOSTING
         if (boosting) boosting_duration += Time.deltaTime;
+        else boosting_duration -= Time.deltaTime / 3f;
+        // GESTION bOOSTING DESACTIVEE
         if (boosting_disabled) boosting_disable_duration += Time.deltaTime;
         //SURCHARGE
         if (boosting && boosting_duration > boosting_durationLimitSec)
@@ -213,6 +222,7 @@ public class SFX_Controller : MonoBehaviour
             boosting_disabled = false;
             boosting_disable_duration = 0f;
         }
+        boosting_old = boosting;
     }
     void update_PodDirection()
     {
@@ -224,7 +234,7 @@ public class SFX_Controller : MonoBehaviour
     void update_PodSpeed()
     {
         //SPEED CALC // MAXSPEED = 100f
-        speed_target = (float)(Math.Pow((enginePowerR + enginePowerL), 2) * 25d) * (breaking ? -0.25f : 1f);
+        speed_target = (float)(Math.Pow((enginePowerR + enginePowerL), 2) * 25d) - (breaking ? speed_value : 0f);
         speed_value = Mathf.Lerp(speed_value, speed_target, Time.deltaTime / speed_timeVariationSec);
     }
     void updateSFX_Reactors()
@@ -354,7 +364,6 @@ public class SFX_Controller : MonoBehaviour
     public void Engine_Start()
     {
         print("Engine ON");
-        engineState = 1;
         speed_value = 0;
         speed_target = 0;
         rotation = 0;
@@ -390,7 +399,14 @@ public class SFX_Controller : MonoBehaviour
         sources[4].volume = 0.2f;
         sources[4].pitch = 0.9f;
         sources[4].Play();
+        //
+        Invoke("activateControls", 3f);
     }
+    public void activateControls()
+    {
+        engineState = 1;
+    }
+
     public void Engine_Shutdown()
     {
         print("Engine OFF");
@@ -429,22 +445,45 @@ public class SFX_Controller : MonoBehaviour
         if (invulnerable) return;
 
         print($"OnCollisionEnter : {--lives} lives");
+        sources[0].PlayOneShot(clips[11]);
+        if (Mathf.Abs(lives) % 2 == 0)
+        {
+            foreach (var blacksmoke in LeftReactor.blacksmokes)
+                if (!blacksmoke.activeInHierarchy)
+                { blacksmoke.SetActive(true); break; }
+            LeftReactor.spawnExplosion();
+        }
+        else
+        {
+            foreach (var blacksmoke in RightReactor.blacksmokes)
+                if (!blacksmoke.activeInHierarchy)
+                { blacksmoke.SetActive(true); break; }
+            RightReactor.spawnExplosion();
+        }
+
         if (lives == 0) game_gameover();
         if (resetVelocityAndPower)
         {
             reset_PodracerVelocity();
             reset_EnginePower();
         }
+        setInvulnerable();
         update_UI_lives();
+    }
+    public void setInvulnerable()
+    {
+        //SET INVULNERABLE
+        invulnerable = true;
+        invulnerable_duration = 0f;
     }
     public void game_gameover()
     {
         print("game_gameover");
+        Engine_Shutdown();
     }
     public void game_win()
     {
         print("game_win");
-
     }
     private void OnApplicationQuit()
     {
@@ -495,5 +534,7 @@ public class SFX_Controller : MonoBehaviour
         reset_EnginePower();
         breaking = false;
         lives = lives_start;
+        update_UI_lives();
+        foreach (var blacksmoke in RightReactor.blacksmokes) blacksmoke.SetActive(false);
     }
 }

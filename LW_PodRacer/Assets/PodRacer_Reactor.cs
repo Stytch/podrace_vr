@@ -5,6 +5,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class PodRacer_Reactor : MonoBehaviour
 {
+    [Header("MODIFIERS")]
     private bool started;
     public float scoups_opening_mult = -10f;
     public float reactorPower;
@@ -19,19 +20,24 @@ public class PodRacer_Reactor : MonoBehaviour
     public float breakingValue = 0;
     public float ScoupsBreakingSpeed = 20f;
 
+    [Header("LIGHTS & VFX")]
     public Light reactorLight;
     public Light lightningLight;
     public ParticleSystem reactorFlameParticles;
     public ParticleSystem reactorFlameStartingParticles;
 
+    [Header("SUBCOMPONENTS")]
     public GameObject[] shuttersRoots;
     public GameObject[] scoupsRoots;
     public GameObject[] sideShutterRoots;
     public GameObject[] blacksmokes;
 
-    public Color normalRColor_min = new Color(255,169,0);
-    public Color normalRColor_max= new Color(255,245,0);
-    public Color boostRColor_min = new Color(0, 255,237);
+    public GameObject explosion_prefab;
+
+    [Header("VFX COLORS")]
+    public Color normalRColor_min = new Color(255, 169, 0);
+    public Color normalRColor_max = new Color(255, 245, 0);
+    public Color boostRColor_min = new Color(0, 255, 237);
     public Color boostRColor_max = new Color(0, 255, 148);
 
     void Start()
@@ -54,7 +60,6 @@ public class PodRacer_Reactor : MonoBehaviour
         foreach (var item in blacksmokes) item.SetActive(false);
 
     }
-
     public void startReactor()
     {
         reactorFlameStartingParticles.gameObject.SetActive(true);
@@ -62,7 +67,6 @@ public class PodRacer_Reactor : MonoBehaviour
         reactorFlameStartingParticles.Play();
         Invoke("finalStartReactor", 3f);
     }
-
     public void finalStartReactor()
     {
 
@@ -70,8 +74,14 @@ public class PodRacer_Reactor : MonoBehaviour
         reactorFlameParticles.gameObject.SetActive(true);
         reactorLight.intensity = light_powermin;
         reactorLight.color = normalRColor_min;
+        //SHUTTERS
+        Vector3 tmp = new Vector3((1) * shutter_opening_mult, 0, 0);
+        for (int i = 0; i < shuttersRoots.Length; i++) shuttersRoots[i].transform.localEulerAngles = tmp;
     }
-
+    public void spawnExplosion()
+    {
+        GameObject.Instantiate(explosion_prefab, gameObject.transform);
+    }
     public void Update()
     {
         if (started)
@@ -79,7 +89,7 @@ public class PodRacer_Reactor : MonoBehaviour
             Vector3 tmp;
 
             //BREAKING SCOUPS
-            breakingValue = Mathf.Lerp(breakingValue, (isBreaking?1f:0f), Time.deltaTime * ScoupsBreakingSpeed);
+            breakingValue = Mathf.Lerp(breakingValue, (isBreaking ? 1f : 0f), Time.deltaTime * ScoupsBreakingSpeed);
             tmp = new Vector3(breakingValue * scoups_opening_mult, 0, 0);
             for (int i = 0; i < scoupsRoots.Length; i++) scoupsRoots[i].transform.localEulerAngles = tmp;
 
@@ -101,7 +111,7 @@ public class PodRacer_Reactor : MonoBehaviour
             main.startColor = gradient;
 
             //LIGHT
-            reactorLight.intensity = light_powermin +(reactorPower) * light_powermax * Random.Range(0.5f,1f);
+            reactorLight.intensity = light_powermin + (reactorPower) * light_powermax * Random.Range(0.5f, 1f);
             reactorLight.color = Color.Lerp(normalRColor_min, boostRColor_min, boosting_value);
         }
     }
