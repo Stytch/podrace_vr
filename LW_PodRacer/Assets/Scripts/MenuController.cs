@@ -5,18 +5,15 @@ using UnityEngine.UIElements;
 
 public class MenuController : MonoBehaviour
 {
-    public Button PlayButton;
-    public Button OptionButton;
-    public Button QuitButton;
 
+    public GameObject MenuButton;
+    public GameObject Canvas;
 
-    // Start is called before the first frame update
     void Start()
     {
-        
+        OpenMainMenu();
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
         
@@ -38,5 +35,59 @@ public class MenuController : MonoBehaviour
     {
         Debug.Log("QuitButton Pressed");
         Application.Quit();
+    }
+
+    public void OpenMainMenu()
+    {
+        GameObject PlayButton = Instantiate(MenuButton, Canvas.transform);
+        PlayButton.GetComponent<MenuButtonController>().CurrentButtonType = MenuButtonController.ButtonTypes.Play;
+        PlayButton.GetComponent<MenuButtonController>().MenuController = this;
+        PlayButton.GetComponent<MenuButtonController>().ButtonText = "Play";
+
+        GameObject OptionButton = Instantiate(MenuButton, Canvas.transform);
+        OptionButton.GetComponent<MenuButtonController>().CurrentButtonType = MenuButtonController.ButtonTypes.Option;
+        OptionButton.GetComponent<MenuButtonController>().MenuController = this;
+        OptionButton.GetComponent<MenuButtonController>().ButtonText = "Options";
+
+        GameObject QuitButton = Instantiate(MenuButton, Canvas.transform);
+        QuitButton.GetComponent<MenuButtonController>().CurrentButtonType = MenuButtonController.ButtonTypes.Quit;
+        QuitButton.GetComponent<MenuButtonController>().MenuController = this;
+        QuitButton.GetComponent<MenuButtonController>().ButtonText = "Quit";
+    }
+
+    public void OpenPauseMenu()
+    {
+        GameObject PlayButton = Instantiate(MenuButton, Canvas.transform);
+        PlayButton.GetComponent<MenuButtonController>().CurrentButtonType = MenuButtonController.ButtonTypes.Resume;
+        PlayButton.GetComponent<MenuButtonController>().MenuController = this;
+        PlayButton.GetComponent<MenuButtonController>().ButtonText = "Resume";
+
+        GameObject OptionButton = Instantiate(MenuButton, Canvas.transform);
+        OptionButton.GetComponent<MenuButtonController>().CurrentButtonType = MenuButtonController.ButtonTypes.Option;
+        OptionButton.GetComponent<MenuButtonController>().MenuController = this;
+        OptionButton.GetComponent<MenuButtonController>().ButtonText = "Options";
+
+        GameObject QuitButton = Instantiate(MenuButton, Canvas.transform);
+        QuitButton.GetComponent<MenuButtonController>().CurrentButtonType = MenuButtonController.ButtonTypes.Menu;
+        QuitButton.GetComponent<MenuButtonController>().MenuController = this;
+        QuitButton.GetComponent<MenuButtonController>().ButtonText = "Quit to Menu";
+    }
+
+    public void OpenDeathMenu()
+    {
+        GameObject PlayButton = Instantiate(MenuButton, Canvas.transform);
+        PlayButton.GetComponent<MenuButtonController>().CurrentButtonType = MenuButtonController.ButtonTypes.Play;
+        PlayButton.GetComponent<MenuButtonController>().MenuController = this;
+        PlayButton.GetComponent<MenuButtonController>().ButtonText = "Replay";
+
+        GameObject OptionButton = Instantiate(MenuButton, Canvas.transform);
+        OptionButton.GetComponent<MenuButtonController>().CurrentButtonType = MenuButtonController.ButtonTypes.Option;
+        OptionButton.GetComponent<MenuButtonController>().MenuController = this;
+        OptionButton.GetComponent<MenuButtonController>().ButtonText = "Options";
+
+        GameObject QuitButton = Instantiate(MenuButton, Canvas.transform);
+        QuitButton.GetComponent<MenuButtonController>().CurrentButtonType = MenuButtonController.ButtonTypes.Menu;
+        QuitButton.GetComponent<MenuButtonController>().MenuController = this;
+        QuitButton.GetComponent<MenuButtonController>().ButtonText = "Quit to Menu";
     }
 }
