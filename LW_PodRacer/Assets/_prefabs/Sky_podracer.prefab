@@ -4171,6 +4171,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 95c30fd59c5faa448adbb47926708ed6, type: 3}
   - {fileID: 8300000, guid: a06b289dd88bd3b4fab3cb7397cba68c, type: 3}
   - {fileID: 8300000, guid: f8e9264dc2415524ba52b36a0af25c8f, type: 3}
+  - {fileID: 8300000, guid: 823132de834007645ac33e6e5de37e1d, type: 3}
   sources:
   - {fileID: 3376189397928257419}
   - {fileID: 3376189397928257420}
@@ -4197,9 +4198,9 @@ MonoBehaviour:
   speed_timeVariationSec: 3
   speed_acceleration: 2
   speed_deceleration: 2
-  boosting_timeVariationSec: 3
+  boosting_timeVariationSec: 2
   boosting_power: 0.5
-  boosting_durationLimitSec: 5
+  boosting_durationLimitSec: 3
   boosting_disable_durationLimitSec: 5
   invulnerable: 0
   invulnerable_duration: 0

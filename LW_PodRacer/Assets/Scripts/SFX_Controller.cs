@@ -42,6 +42,7 @@ public class SFX_Controller : MonoBehaviour
     /// 5 : Acceleration
     /// </summary>
     private int engineState = 0;
+    private bool engineStateChange = false;
     /// <summary>
     /// 0-0 : stable
     /// 0-1 : accelaration 
@@ -132,14 +133,17 @@ public class SFX_Controller : MonoBehaviour
         {
             reset_Podracer();
         }
-        if (input_SWITCHPOWER && engineState == 0)
+        if (input_SWITCHPOWER && engineState == 0 && !engineStateChange)
         {
+            engineStateChange = true;
             print("Engine_Start");
             sources[0].PlayOneShot(clips[0]);
             Invoke("Engine_Start", duration_engine_starting);
+            Invoke("StartConnexion", 1f);
         }
-        else if (input_SWITCHPOWER && engineState == 1)
+        else if (input_SWITCHPOWER && engineState == 1 && !engineStateChange)
         {
+            engineStateChange = true;
             print("Engine_Shutdown");
             sources[0].PlayOneShot(clips[7]);
             Invoke("Engine_Shutdown", duration_engine_shutdown);
@@ -202,7 +206,7 @@ public class SFX_Controller : MonoBehaviour
         boosting = input_BOOSTING && !boosting_disabled;
         boosting_value = Mathf.Lerp(boosting_value, (boosting ? 1f : 0f), Time.deltaTime / boosting_timeVariationSec);
         // SFX BOOST
-        if(!boosting && boosting_old) sources[0].PlayOneShot(clips[10]);
+        if (!boosting && boosting_old) sources[0].PlayOneShot(clips[10]);
         // GESTION DUREE BOOSTING
         if (boosting) boosting_duration += Time.deltaTime;
         else boosting_duration -= Time.deltaTime / 3f;
@@ -364,6 +368,7 @@ public class SFX_Controller : MonoBehaviour
     public void Engine_Start()
     {
         print("Engine ON");
+
         speed_value = 0;
         speed_target = 0;
         rotation = 0;
@@ -405,6 +410,8 @@ public class SFX_Controller : MonoBehaviour
     public void activateControls()
     {
         engineState = 1;
+        engineStateChange = false;
+
     }
 
     public void Engine_Shutdown()
@@ -412,6 +419,7 @@ public class SFX_Controller : MonoBehaviour
         print("Engine OFF");
         engineState = 0;
         speed_value = 0;
+        engineStateChange = false;
         speed_target = 0;
         rotation = 0;
         rotation_target = 0;
@@ -469,6 +477,7 @@ public class SFX_Controller : MonoBehaviour
         }
         setInvulnerable();
         update_UI_lives();
+        StartCoroutine(invulnerableUIfx());
     }
     public void setInvulnerable()
     {
@@ -498,7 +507,24 @@ public class SFX_Controller : MonoBehaviour
     }
     //private void OnCollisionExit(Collision collision)
 
+    IEnumerator invulnerableUIfx()
+    {
+        float timer = Time.timeSinceLevelLoad;
+        Color c = ui.img_feu.color;
+        while (Time.timeSinceLevelLoad - timer < invulnerable_durationLimitSec)
+        {
+            c.a = 0.5f + Mathf.Sin(Time.timeSinceLevelLoad * 45f) / 2f;
+            ui.img_feu.color = c;
+            yield return null;
+        }
+        c.a = 1f;
+        ui.img_feu.color = c;
+    }
 
+    private void StartConnexion()
+    {
+        sources[0].PlayOneShot(clips[13]);
+    }
 
     private void reset_UI()
     {
