@@ -1,0 +1,13 @@
+# Blender MTL File: 'OBJ_Finaux.blend'
+# Material Count: 1
+
+newmtl tower_Mat
+Ns 69.192136
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.613636 0.613636 0.613636
+Ke 0.0 0.0 0.0
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:\\Users\\saidb\\Documents\\STMN\\3A\\VR\\tower_ao.png
