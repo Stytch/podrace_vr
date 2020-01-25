@@ -6,20 +6,30 @@ public class MeshGenerator : MonoBehaviour
 {
     //VARIABLES
     private MapGenerator mapGen;
-    private textureChunk[,] textureChunks;
+    [HideInInspector]
+    public textureChunk[,] textureChunks;
     private GameObject allTrackMesh = null;
 
     private int xChunk;
     private int zChunk;
 
     public bool debugModeTexture = true;
+    public Material trackMaterial;
     public Color mapColor;
     public float HeightMapFactor = 30f;
 
     //FUNCTIONS
     public void Clean()
     {
-        if (allTrackMesh != null) Destroy(allTrackMesh);
+
+        if (allTrackMesh != null)
+        {
+#if UNITY_EDITOR
+            DestroyImmediate(allTrackMesh);
+#else
+            Destroy(allTrackMesh);
+#endif
+        }
     }
 
     public bool IniVariable()
@@ -33,7 +43,7 @@ public class MeshGenerator : MonoBehaviour
             textureChunks = mapGen.textureChunks;
             xChunk = textureChunks.GetLength(0);
             zChunk = textureChunks.GetLength(1);
-
+            
             return true;
         }
         else
@@ -95,6 +105,8 @@ public class MeshGenerator : MonoBehaviour
                     GameObject go = new GameObject();
                     if (allTrackMesh != null) go.transform.parent = allTrackMesh.transform;
 
+                    go.layer = 8;
+
                     go.name = "Track Mesh [" + x + "," + z + "]";
 
                     go.transform.position = tc.plane.transform.position;
@@ -111,12 +123,23 @@ public class MeshGenerator : MonoBehaviour
 
                     //MESH RENDERER
                     MeshRenderer mr = go.AddComponent<MeshRenderer>();
-                    mr.sharedMaterial = new Material(Shader.Find("Standard"));
-                    if (debugModeTexture) mr.sharedMaterial.mainTexture = mapGen.TextureFromPlane(tc.pixels);
+
+                    if(trackMaterial != null)
+                    {
+                        mr.material = trackMaterial;
+                        if (debugModeTexture) mr.material.mainTexture = mapGen.TextureFromPlane(tc.pixels);                        
+                    }
                     else
                     {
-                        mr.sharedMaterial.color = mapColor;
+                        mr.sharedMaterial = new Material(Shader.Find("Standard"));
+                        if (debugModeTexture) mr.sharedMaterial.mainTexture = mapGen.TextureFromPlane(tc.pixels);
+                        else
+                        {
+                            mr.sharedMaterial.color = mapColor;
+                        }
                     }
+
+                    textureChunks[x, z].MeshObject = go;
                 }
             }
         }

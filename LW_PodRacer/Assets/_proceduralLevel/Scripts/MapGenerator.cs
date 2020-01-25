@@ -10,6 +10,8 @@ public struct textureChunk
 
     public GameObject plane { get; set; }
 
+    public GameObject MeshObject { get; set; }
+
     public int width { get; set; }
 
     public int height { get; set; }
@@ -23,6 +25,8 @@ public struct textureChunk
     public float scaleFactor { get; set; }
 
     public int chunkScale { get; set; }
+
+    public bool isCanyonPart { get; set; }
 }
 
 public class MapGenerator : MonoBehaviour
@@ -71,7 +75,15 @@ public class MapGenerator : MonoBehaviour
     //FUNCTIONS
     public void Clean()
     {
-        if (allPlane != null) Destroy(allPlane);
+
+        if (allPlane != null)
+        {
+#if UNITY_EDITOR
+            DestroyImmediate(allPlane);
+#else
+            Destroy(allPlane);
+#endif
+        }
     }
 
     //INITIALISE LES VARIABLES
@@ -173,6 +185,7 @@ public class MapGenerator : MonoBehaviour
         }
 
         textureChunks[chunk.Item1, chunk.Item2].heightMap[newPoint.Item1, newPoint.Item2] = 0.0f;
+        textureChunks[chunk.Item1, chunk.Item2].isCanyonPart = true;
 
         return true;
     }
@@ -272,7 +285,7 @@ public class MapGenerator : MonoBehaviour
         tp.resolutionMap = resolutionMap;
         tp.scaleFactor = scaleFactor;
         tp.chunkScale = chunkScale;
-
+        tp.isCanyonPart = false;
         //tp.plane.GetComponent<Renderer>().sharedMaterial.mainTexture = TextureFromPlane(tp.pixels);
         return tp;
     }
@@ -316,7 +329,7 @@ public class MapGenerator : MonoBehaviour
                 
                 //PIXEL
                 textureChunks[cx, cz].pixels[realPz*resolutionMap + realPx] = Color.white;
-                
+
                 //heightMap //Pixel complet
                 SetPointHeighMap((cx, cz), (realPx, realPz));
                 SetPointHeighMap((cx, cz), (realPx+1, realPz));
