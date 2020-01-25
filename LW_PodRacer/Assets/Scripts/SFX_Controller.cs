@@ -75,6 +75,7 @@ public class SFX_Controller : MonoBehaviour
     private bool boosting_disabled = false;
     private float boosting_disable_duration = 0f;
     public float boosting_disable_durationLimitSec = 5f;
+    public float boosting_duration_decrease = 5f;
 
     [Header("SFX_Pertubations_effect")]
     public bool invulnerable = false;
@@ -209,7 +210,7 @@ public class SFX_Controller : MonoBehaviour
         if (!boosting && boosting_old) sources[0].PlayOneShot(clips[10]);
         // GESTION DUREE BOOSTING
         if (boosting) boosting_duration += Time.deltaTime;
-        else boosting_duration -= Time.deltaTime / 3f;
+        else if (boosting_duration > 0f) boosting_duration -= Time.deltaTime / boosting_duration_decrease;
         // GESTION bOOSTING DESACTIVEE
         if (boosting_disabled) boosting_disable_duration += Time.deltaTime;
         //SURCHARGE
@@ -238,7 +239,7 @@ public class SFX_Controller : MonoBehaviour
     void update_PodSpeed()
     {
         //SPEED CALC // MAXSPEED = 100f
-        speed_target = (float)(Math.Pow((enginePowerR + enginePowerL), 2) * 25d) - (breaking ? speed_value : 0f);
+        speed_target = (float)(Math.Pow((enginePowerR + enginePowerL), 2) * 25d) - (breaking ? speed_value - 5f : 0f);
         speed_value = Mathf.Lerp(speed_value, speed_target, Time.deltaTime / speed_timeVariationSec);
     }
     void updateSFX_Reactors()
