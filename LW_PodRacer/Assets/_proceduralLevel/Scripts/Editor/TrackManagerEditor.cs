@@ -12,6 +12,8 @@ public class TrackManagerEditor : Editor
 
         DrawDefaultInspector();
 
+        tm.cleanEnd = GUILayout.Toggle(tm.cleanEnd, "Clean End");
+
         if (GUILayout.Button("Generate Track"))
         {
             tm.GenerateTrack();
@@ -20,6 +22,11 @@ public class TrackManagerEditor : Editor
         if (GUILayout.Button("Clean All"))
         {
             tm.CleanAll();
+        }
+
+        if (GUILayout.Button("Get End Position"))
+        {
+            tm.GetEndPosition();
         }
     }
 }

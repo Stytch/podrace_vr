@@ -482,7 +482,15 @@ public class TrackGenerator : MonoBehaviour
     #region Event Start
     public void Clean()
     {
-        if (goTracks != null) Destroy(goTracks);
+        if (goTracks != null)
+        {
+#if UNITY_EDITOR
+            DestroyImmediate(goTracks);
+#else
+            Destroy(goTracks);
+#endif
+        }
+
     }
     // Start is called before the first frame update
 
@@ -496,7 +504,7 @@ public class TrackGenerator : MonoBehaviour
     {
 
     }
-    #endregion
+#endregion
 
 }
 #endregion
