@@ -238,7 +238,7 @@ public class SFX_Controller : MonoBehaviour
     void update_PodSpeed()
     {
         //SPEED CALC // MAXSPEED = 100f
-        speed_target = (float)(Math.Pow((enginePowerR + enginePowerL), 2) * 25d) - (breaking ? speed_value : 0f);
+        speed_target = (float)(Math.Pow((enginePowerR + enginePowerL), 2) * 25d) - (breaking ? speed_value - 5f : 0f);
         speed_value = Mathf.Lerp(speed_value, speed_target, Time.deltaTime / speed_timeVariationSec);
     }
     void updateSFX_Reactors()
