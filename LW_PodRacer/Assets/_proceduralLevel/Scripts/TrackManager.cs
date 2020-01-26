@@ -13,6 +13,8 @@ public class TrackManager : MonoBehaviour
 
     [HideInInspector]
     public Vector3 EndPosition;
+    [HideInInspector]
+    public Transform EndObject;
 
 
 
@@ -35,7 +37,8 @@ public class TrackManager : MonoBehaviour
             mapG.Generate();
             meshG.GenerateAllMesh();
 
-            if (cleanEnd) CleanEnd();
+            if (cleanEnd)CleanEnd();
+            //CreateEndObject();
         }
         else
         {
@@ -76,6 +79,13 @@ public class TrackManager : MonoBehaviour
         else return Vector3.zero;
     }
 
+    /*
+    public Vector3 GetEndPosition()
+    {
+        if (EndObject != null) return EndObject.position;
+        else return Vector3.zero;
+    }*/
+
     public Vector3 GetEndPosition()
     {
         if(cleanEnd)
@@ -107,7 +117,7 @@ public class TrackManager : MonoBehaviour
                     if(count != 0)
                     {
                         Vector3 meshPosition = mapG.textureChunks[x, z].MeshObject.transform.position;
-                        meshPosition -= (vec / count) * mapG.textureChunks[x, z].MeshObject.transform.localScale.x;
+                        meshPosition -= (vec / count) * mapG.textureChunks[x, z].MeshObject.transform.localScale.x * meshG.allTrackMesh.transform.localScale.x;
 
                         medianVec += meshPosition;
                         medianCount++;
@@ -127,6 +137,18 @@ public class TrackManager : MonoBehaviour
 
         return Vector3.zero;
     }
+
+    /*
+    public void CreateEndObject()
+    {
+        if (EndObject != null) EndObject.position = GenerateEndPosition();
+        else
+        {
+            EndObject = new GameObject("EndPosition").transform;
+            EndObject.position = GenerateEndPosition();
+            EndObject.parent = meshG.allTrackMesh.transform;
+        }
+    }*/
 
     // Start is called before the first frame update
     void Start()

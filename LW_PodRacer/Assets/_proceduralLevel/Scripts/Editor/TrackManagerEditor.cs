@@ -26,7 +26,9 @@ public class TrackManagerEditor : Editor
 
         if (GUILayout.Button("Get End Position"))
         {
-            tm.GetEndPosition();
+            Debug.Log(tm.GetEndPosition());
+            GameObject test = new GameObject("test");
+            test.transform.position = tm.GetEndPosition();
         }
     }
 }
