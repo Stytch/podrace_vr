@@ -1,0 +1,16 @@
+{
+  "source": "Unity",
+  "applications": [
+    {
+      "app_key": "application.generated.unity.lw_podracer.exe",
+      "launch_type": "url",
+      "url": "steam://launch/",
+      "action_manifest_path": "D:\\Users\\Stytch\\Documents\\Projet Unity\\podrace_vr\\LW_PodRacer\\Assets\\StreamingAssets\\SteamVR\\actions.json",
+      "strings": {
+        "en_us": {
+          "name": "LW_PodRacer [Testing]"
+        }
+      }
+    }
+  ]
+}

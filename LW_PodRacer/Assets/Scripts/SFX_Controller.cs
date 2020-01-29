@@ -104,6 +104,12 @@ public class SFX_Controller : MonoBehaviour
     public int lives_start = 3;
     //public bool disableInputs;
 
+    [Header("STEAM_VR")]
+    public Valve.VR.InteractionSystem.LinearMapping Linear_L;
+    public Valve.VR.InteractionSystem.LinearMapping Linear_R;
+    private float val_Linear_L = 0.0f;
+    private float val_Linear_R = 0.0f;
+
     private void Awake()
     {
         terrainMask = LayerMask.GetMask("Terrain");
@@ -131,8 +137,14 @@ public class SFX_Controller : MonoBehaviour
     private bool input_BREAKING { get => (Input.GetKey(KeyCode.KeypadPlus) || Input.GetKey("joystick button 3")); }
     private bool input_BREAKING_down { get => (Input.GetKeyDown(KeyCode.KeypadPlus) || Input.GetKeyDown("joystick button 3")); }
     private bool input_SWITCHPOWER { get => (Input.GetKeyDown(KeyCode.Keypad0) || Input.GetButtonDown("joystick button 1")); }
-    private float input_POWER_LEFT { get => (Input.GetKey(KeyCode.Keypad2) ? 1f : 0) + Input.GetAxis("LT"); }
-    private float input_POWER_RIGHT { get => (Input.GetKey(KeyCode.Keypad1) ? 1f : 0) + Input.GetAxis("RT"); }
+    private float input_POWER_LEFT { get => (Input.GetKey(KeyCode.Keypad2) ? 1f : 0) + Input.GetAxis("LT") + val_Linear_L; }
+    private float input_POWER_RIGHT { get => (Input.GetKey(KeyCode.Keypad1) ? 1f : 0) + Input.GetAxis("RT")+ val_Linear_R; }
+
+    private void Update_LinearValue()
+    {
+        if (Linear_L != null) val_Linear_L = Linear_L.value;
+        if (Linear_R != null) val_Linear_R = Linear_R.value;
+    }
 
     void Update()
     {
@@ -166,6 +178,7 @@ public class SFX_Controller : MonoBehaviour
             /* --- UPDATE BREAKING INPUT ----------*/
             breaking = input_BREAKING;
             /* --- UPDATE POWER INPUT ----------*/
+            Update_LinearValue();
             enginePowerL = Mathf.Lerp(
                 enginePowerL
                 , input_POWER_LEFT + boosting_value * boosting_power
@@ -526,13 +539,13 @@ public class SFX_Controller : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
-        if (engineState > 0)
+        if (engineState > 0) 
         {
             print("=== COLLISION ==========");
             print(collision.gameObject);
             print(collision.GetContact(0));
             Debug.DrawLine(gameObject.transform.position, collision.GetContact(0).point, Color.green, 10f);
-            Debug.Break();
+            //Debug.Break();
             ApplyDamage(true);
         }
     }
