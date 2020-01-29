@@ -14,7 +14,7 @@ public class TrackManager : MonoBehaviour
     [HideInInspector]
     public Vector3 EndPosition;
 
-
+    public Vector3 ScaleTrack = new Vector3(35, 35, 35);
 
     private bool IniVariable()
     {
@@ -36,6 +36,7 @@ public class TrackManager : MonoBehaviour
             meshG.GenerateAllMesh();
 
             if (cleanEnd) CleanEnd();
+            meshG.allTrackMesh.transform.localScale = ScaleTrack;
         }
         else
         {

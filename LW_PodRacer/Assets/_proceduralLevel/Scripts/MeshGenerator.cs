@@ -8,7 +8,8 @@ public class MeshGenerator : MonoBehaviour
     private MapGenerator mapGen;
     [HideInInspector]
     public textureChunk[,] textureChunks;
-    private GameObject allTrackMesh = null;
+    [HideInInspector]
+    public GameObject allTrackMesh = null;
 
     private int xChunk;
     private int zChunk;
