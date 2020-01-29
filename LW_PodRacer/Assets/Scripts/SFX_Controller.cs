@@ -300,7 +300,7 @@ public class SFX_Controller : MonoBehaviour
         if (m_tempete != null)
         {
             float dist = Vector3.Distance(transform.position, m_tempete.transform.position) - 2600f;
-            ui.text_tempete.text = dist.ToString() + "m";
+            ui.text_tempete.text = ((int)dist).ToString() + "m";
             ui.img_tempete.fillAmount = 1f - Mathf.Clamp01(dist / distanceMaxIndicator);
             if (dist <= 0f)
             {
@@ -530,9 +530,9 @@ public class SFX_Controller : MonoBehaviour
         {
             print("=== COLLISION ==========");
             print(collision.gameObject);
-            print(collision.GetContact(0));
-            Debug.DrawLine(gameObject.transform.position, collision.GetContact(0).point, Color.green, 10f);
-            Debug.Break();
+            //print(collision.GetContact(0));
+            Debug.DrawLine(gameObject.transform.position, collision.GetContact(0).point, Color.blue, 10f);
+            //Debug.Break();
             ApplyDamage(true);
         }
     }
