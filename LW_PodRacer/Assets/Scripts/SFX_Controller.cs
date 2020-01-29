@@ -10,6 +10,10 @@ public class SFX_Controller : MonoBehaviour
     [Header("GAME_Manager")]
     public GameManager m_gamemanager;
 
+    [Header("GAME_TEMPETE")]
+    public Tempete m_tempete;
+    public float distanceMaxIndicator = 1000f;
+
     [Header("SFX_Ressources")]
     public AudioClip[] clips;
     public AudioSource[] sources;
@@ -126,7 +130,7 @@ public class SFX_Controller : MonoBehaviour
     private bool input_BOOSTING { get => (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5")) || Input.GetKey(KeyCode.Keypad3); }
     private bool input_BREAKING { get => (Input.GetKey(KeyCode.KeypadPlus) || Input.GetKey("joystick button 3")); }
     private bool input_BREAKING_down { get => (Input.GetKeyDown(KeyCode.KeypadPlus) || Input.GetKeyDown("joystick button 3")); }
-    private bool input_SWITCHPOWER { get => (Input.GetKeyDown(KeyCode.Keypad0) || Input.GetButtonDown("joystick button 7")); }
+    private bool input_SWITCHPOWER { get => (Input.GetKeyDown(KeyCode.Keypad0) || Input.GetButtonDown("joystick button 1")); }
     private float input_POWER_LEFT { get => (Input.GetKey(KeyCode.Keypad2) ? 1f : 0) + Input.GetAxis("LT"); }
     private float input_POWER_RIGHT { get => (Input.GetKey(KeyCode.Keypad1) ? 1f : 0) + Input.GetAxis("RT"); }
 
@@ -293,8 +297,18 @@ public class SFX_Controller : MonoBehaviour
     }
     void update_UI_distanceTempete()
     {
-        ui.text_tempete.text = 0f.ToString() + "mètres";
-        ui.img_tempete.fillAmount = 0f; ;
+        if (m_tempete != null)
+        {
+            float dist = Vector3.Distance(transform.position, m_tempete.transform.position) - 2600f;
+            ui.text_tempete.text = dist.ToString() + "m";
+            ui.img_tempete.fillAmount = 1f - Mathf.Clamp01(dist / distanceMaxIndicator);
+            if (dist <= 0f)
+            {
+                print("TEMPETE GAGNE !");
+                game_gameover();
+            }
+        }
+
     }
 
     private void FixedUpdate()
@@ -317,7 +331,10 @@ public class SFX_Controller : MonoBehaviour
                 hoverDirection = Quaternion.AngleAxis(90, transform.right) * hit.normal;
                 hoverUp = hit.normal;
                 Debug.DrawRay(hit.point, hoverDirection * 10f, Color.cyan);
-                body.AddForce(Vector3.up * (body_hover_height - hit.distance) * ground_repulsation * (UnityEngine.Random.Range(1f, body_hover_height / 2f)), ForceMode.Acceleration);
+                body.AddForce(transform.up/*ou hoverUp*/
+                    * Mathf.Max(body_hover_height - hit.distance, 0)
+                    * ground_repulsation /*un peu de random (UnityEngine.Random.Range(1f, body_hover_height / 2f))*/
+                    , ForceMode.Acceleration);
             }
             else
             {
@@ -326,7 +343,10 @@ public class SFX_Controller : MonoBehaviour
             }
 
             //SPEED BY ENGINE FORCE
-            body.AddForce((transform.forward * speed_value * body_speed_mult), ForceMode.Force);// + (Vector3.up * podSpeed)
+            body.AddForce(
+                (Quaternion.Euler(0, transform.eulerAngles.y, 0) * Vector3.forward * speed_value * body_speed_mult)
+                //(transform.forward * speed_value * body_speed_mult)
+                , ForceMode.Force);// + (Vector3.up * podSpeed)
 
             //VIRAGE VELOCITEE
             //STABILISATEUR ASSIETTE.
@@ -491,7 +511,7 @@ public class SFX_Controller : MonoBehaviour
     }
     public void game_gameover()
     {
-        print("game_gameover");
+        print("game_loose");
         Engine_Shutdown();
         m_gamemanager.endGame(GameEndStatus.loose);
     }
@@ -508,9 +528,15 @@ public class SFX_Controller : MonoBehaviour
     {
         if (engineState > 0)
         {
+            print("=== COLLISION ==========");
+            print(collision.gameObject);
+            print(collision.GetContact(0));
+            Debug.DrawLine(gameObject.transform.position, collision.GetContact(0).point, Color.green, 10f);
+            Debug.Break();
             ApplyDamage(true);
         }
     }
+
     //private void OnCollisionExit(Collision collision)
 
     IEnumerator invulnerableUIfx()

@@ -4061,6 +4061,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_gamemanager: {fileID: 0}
+  m_tempete: {fileID: 0}
+  distanceMaxIndicator: 1000
   clips:
   - {fileID: 8300000, guid: 58135f82dfd621944a8cf6470cdfd580, type: 3}
   - {fileID: 8300000, guid: b3a402e6d62bc9c4980dc48ed59d9aa5, type: 3}
@@ -4088,7 +4090,7 @@ MonoBehaviour:
   body_rotation_mult: 0.15
   body_stabilisator_mult: 0.0125
   body_inclinaison_maxangle: 100
-  body_hover_height: 20
+  body_hover_height: 5
   LeftReactor: {fileID: 9109495898039475511}
   RightReactor: {fileID: 3345094723689091407}
   LightningAnimation:
@@ -4103,8 +4105,8 @@ MonoBehaviour:
   speed_acceleration: 2
   speed_deceleration: 2
   boosting_timeVariationSec: 1
-  boosting_power: 0.5
-  boosting_durationLimitSec: 5
+  boosting_power: 1
+  boosting_durationLimitSec: 4
   boosting_disable_durationLimitSec: 5
   boosting_duration_decrease: 5
   invulnerable: 0
