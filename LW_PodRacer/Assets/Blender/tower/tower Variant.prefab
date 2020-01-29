@@ -24,7 +24,7 @@ PrefabInstance:
     - target: {fileID: -927199367670048503, guid: fdfc61e7105df8844bee779ab29eb800,
         type: 3}
       propertyPath: m_Name
-      value: tower
+      value: tower Variant
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: fdfc61e7105df8844bee779ab29eb800,
         type: 3}
@@ -100,7 +100,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 59317f5bbe0dc0545b41a794b50f3940, type: 2}
+      objectReference: {fileID: 2100000, guid: f99e6a3d6ea61cd4497ba1ee12960148, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fdfc61e7105df8844bee779ab29eb800, type: 3}
 --- !u!1 &2681079233050202793 stripped
