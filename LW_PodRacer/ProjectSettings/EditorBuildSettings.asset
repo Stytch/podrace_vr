@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/sceneIntegrationProceduraleRemi.unity
+    guid: 975b52110440f684c8b40e71ce433277
   m_configObjects: {}
