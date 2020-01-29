@@ -7,6 +7,7 @@ public class TrackManager : MonoBehaviour
     private TrackGenerator trackG;
     private MapGenerator mapG;
     private MeshGenerator meshG;
+    private PropsGenerator propsG;
 
     [HideInInspector]
     public bool cleanEnd = true;
@@ -23,8 +24,9 @@ public class TrackManager : MonoBehaviour
         trackG = transform.GetComponent<TrackGenerator>();
         mapG = transform.GetComponent<MapGenerator>();
         meshG = transform.GetComponent<MeshGenerator>();
+        propsG = transform.GetComponent<PropsGenerator>();
 
-        if (trackG == null || mapG == null || meshG == null) return false;
+        if (trackG == null || mapG == null || meshG == null || propsG == null) return false;
 
         return true;
     }
@@ -36,6 +38,7 @@ public class TrackManager : MonoBehaviour
             trackG.GenerateTrack(HideTracks:true);
             mapG.Generate();
             meshG.GenerateAllMesh();
+            propsG.GenerateAllProps();
 
             if (cleanEnd) CleanEnd();
             meshG.allTrackMesh.transform.localScale = ScaleTrack;

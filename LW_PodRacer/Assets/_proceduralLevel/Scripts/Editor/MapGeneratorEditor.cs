@@ -6,11 +6,11 @@ using UnityEditor;
 [CustomEditor(typeof(MapGenerator))]
 public class MapGeneratorEditor : Editor
 {
-    public int selected = 1;
+    public int selected = 0;
 
     string[] options = new string[] { "12", "25", "50", "100" };
     int[] resolutionMap = new int[] {12,25,50,100 };
-    float[] scaleFactor = new float[] { 0.72f, 0.18f, 0.045f, 0.01125f };
+    float[] scaleFactor = new float[] { 0.77f, 0.18f, 0.045f, 0.01125f };
 
     public override void OnInspectorGUI()
     {

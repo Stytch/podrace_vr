@@ -50,7 +50,7 @@ public class PropsGenerator : MonoBehaviour
         MeshRenderer[] allMat = allProps.GetComponentsInChildren<MeshRenderer>();
         foreach(MeshRenderer m in allMat)
         {
-            m.sharedMaterial.color = Color.red;
+            m.material.color = Color.red;
         }
     }
 
@@ -83,7 +83,7 @@ public class PropsGenerator : MonoBehaviour
                     if (test < 50)
                     {
                         float sca = Random.Range(0.1f, 2f);
-                        Vector3 pos = p.position + p.normal * Random.Range(0.1f, 10.0f) + Vector3.down *3;
+                        Vector3 pos = p.position + p.normal * Random.Range(0.1f, 10.0f) + Vector3.down *5;
                         GameObject r= InstanceProps(rock,pos, Random.Range(0, 360), new Vector3(sca, sca * Random.Range(1,4), sca));
                         
                     }
