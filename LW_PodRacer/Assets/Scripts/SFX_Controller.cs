@@ -7,6 +7,9 @@ using UnityEngine.UI;
 
 public class SFX_Controller : MonoBehaviour
 {
+    [Header("GAME_Manager")]
+    public GameManager m_gamemanager;
+
     [Header("SFX_Ressources")]
     public AudioClip[] clips;
     public AudioSource[] sources;
@@ -490,10 +493,12 @@ public class SFX_Controller : MonoBehaviour
     {
         print("game_gameover");
         Engine_Shutdown();
+        m_gamemanager.endGame(GameEndStatus.loose);
     }
     public void game_win()
     {
         print("game_win");
+        m_gamemanager.endGame(GameEndStatus.win);
     }
     private void OnApplicationQuit()
     {
