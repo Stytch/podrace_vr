@@ -543,7 +543,7 @@ public class SFX_Controller : MonoBehaviour
         {
             print("=== COLLISION ==========");
             print(collision.gameObject);
-            print(collision.GetContact(0));
+            //print(collision.GetContact(0));
             Debug.DrawLine(gameObject.transform.position, collision.GetContact(0).point, Color.green, 10f);
             //Debug.Break();
             ApplyDamage(true);
