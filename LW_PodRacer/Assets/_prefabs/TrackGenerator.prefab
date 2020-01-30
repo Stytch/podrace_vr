@@ -67,8 +67,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ded6f961734448741b2f490144bf09c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resolutionMap: 25
-  scaleFactor: 0.18
+  resolutionMap: 12
+  scaleFactor: 0.77
   chunkScale: 10
   SecureChunk: 1
   noiseOctave: 4
@@ -87,7 +87,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc36d056456222f4c813dcb78b19ae89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  allTrackMesh: {fileID: 0}
   debugModeTexture: 0
+  trackMaterial: {fileID: 2100000, guid: 352fd29826d03c549aacd8e46aebcab5, type: 2}
   mapColor: {r: 0.8490566, g: 0.5700175, b: 0.084104665, a: 0}
   HeightMapFactor: 20
 --- !u!114 &486442620583760871
@@ -102,7 +104,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c773edee8cf87d443b3a568c0f6e4671, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  allProps: {fileID: 0}
   debugMode: 0
+  rock: {fileID: 8142898104381796923, guid: df79796b3ba13b94b93e6a73069eee68, type: 3}
+  tower: {fileID: 8446872685540718388, guid: 0278cffb7761eca49abdc3ef17027034, type: 3}
+  house: {fileID: 6500453502190831835, guid: 13da4b05b0afcd74b95bfd86431cb952, type: 3}
+  ark: {fileID: 7908217146135689448, guid: b9df6dd8936430c4bb8afa0fa3f29164, type: 3}
 --- !u!114 &486442620583760864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -115,3 +122,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53ff5f6a5525fbd44aeb5b112fbfc45f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cleanEnd: 1
+  EndPosition: {x: 0, y: 0, z: 0}
+  EndObject: {fileID: 0}
+  ScaleTrack: {x: 35, y: 35, z: 35}

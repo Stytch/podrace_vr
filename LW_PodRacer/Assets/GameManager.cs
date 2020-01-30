@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
     public GameObject cam_podracer;
     [Header("GAM/TRACK GENERATOR")]
     public TrackManager m_trackManager; // attente full integration procedural finoux
+    public GameObject go_ChunkEnd;
 
     void Start()
     {
@@ -98,6 +99,9 @@ public class GameManager : MonoBehaviour
 
     IEnumerator StartNewGame()
     {
+        //m_trackManager.CleanAll();
+        //m_trackManager.GenerateTrack();
+        //print(m_trackManager.GetEndPosition());
         gameAlive = true;
         print("START NEW GAME");
         m_tempete.moveEnabled = true;
