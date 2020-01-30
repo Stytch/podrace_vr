@@ -3230,8 +3230,8 @@ MonoBehaviour:
   podSpeed: 0
   shutter_opening_mult: 16
   sideshutter_opening_mult: -30
-  light_powermin: 50
-  light_powermax: 150
+  light_powermin: 25
+  light_powermax: 25
   boosting_value: 0
   isBreaking: 0
   breakingValue: 0
@@ -4090,7 +4090,7 @@ MonoBehaviour:
   body_rotation_mult: 0.15
   body_stabilisator_mult: 0.0125
   body_inclinaison_maxangle: 100
-  body_hover_height: 5
+  body_hover_height: 10
   LeftReactor: {fileID: 9109495898039475511}
   RightReactor: {fileID: 3345094723689091407}
   LightningAnimation:
@@ -4118,6 +4118,10 @@ MonoBehaviour:
   duration_engine_decelerationStrike: 2
   ui: {fileID: 3376189397843482799}
   lives_start: 3
+  Linear_L: {fileID: 0}
+  Linear_R: {fileID: 0}
+  hand_L: {fileID: 0}
+  hand_R: {fileID: 0}
 --- !u!54 &3376189397980205561
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4131,9 +4135,9 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 3
+  m_CollisionDetection: 0
 --- !u!135 &8286771325305667161
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -8954,8 +8958,8 @@ MonoBehaviour:
   podSpeed: 0
   shutter_opening_mult: 16
   sideshutter_opening_mult: -30
-  light_powermin: 50
-  light_powermax: 150
+  light_powermin: 25
+  light_powermax: 25
   boosting_value: 0
   isBreaking: 0
   breakingValue: 0
@@ -10159,10 +10163,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3376189398599756326}
     m_Modifications:
-    - target: {fileID: 182542, guid: 5cd5599e01f32bd418f20a3b9eac1c57, type: 3}
-      propertyPath: m_Name
-      value: sand_smoke
-      objectReference: {fileID: 0}
     - target: {fileID: 479346, guid: 5cd5599e01f32bd418f20a3b9eac1c57, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.35998535
@@ -10206,6 +10206,10 @@ PrefabInstance:
     - target: {fileID: 479346, guid: 5cd5599e01f32bd418f20a3b9eac1c57, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 182542, guid: 5cd5599e01f32bd418f20a3b9eac1c57, type: 3}
+      propertyPath: m_Name
+      value: sand_smoke
       objectReference: {fileID: 0}
     - target: {fileID: 19801364, guid: 5cd5599e01f32bd418f20a3b9eac1c57, type: 3}
       propertyPath: SizeModule.curve.maxCurve.m_Curve.Array.size
@@ -10454,16 +10458,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3376189397792839903}
     m_Modifications:
-    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
-        type: 3}
-      propertyPath: m_Name
-      value: reactorvfx_starting
-      objectReference: {fileID: 0}
-    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3568552387723340282, guid: 2918e1363f0083b4bbf11bf832ad9f39,
         type: 3}
       propertyPath: lengthInSec
@@ -10582,6 +10576,16 @@ PrefabInstance:
     - target: {fileID: 3568552387741691066, guid: 2918e1363f0083b4bbf11bf832ad9f39,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
+        type: 3}
+      propertyPath: m_Name
+      value: reactorvfx_starting
+      objectReference: {fileID: 0}
+    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
+        type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -10605,16 +10609,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3376189397792839903}
     m_Modifications:
-    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
-        type: 3}
-      propertyPath: m_Name
-      value: blacksmoke_r
-      objectReference: {fileID: 0}
-    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2045486493690952909, guid: 213bbc8e6fd04714d831b3a231d73a85,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -10675,6 +10669,16 @@ PrefabInstance:
       propertyPath: m_LocalScale.x
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
+        type: 3}
+      propertyPath: m_Name
+      value: blacksmoke_r
+      objectReference: {fileID: 0}
+    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 213bbc8e6fd04714d831b3a231d73a85, type: 3}
 --- !u!1 &6432155634505103407 stripped
@@ -10696,16 +10700,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 94730371271480695}
     m_Modifications:
-    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
-        type: 3}
-      propertyPath: m_Name
-      value: reactorvfx
-      objectReference: {fileID: 0}
-    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3568552387723340282, guid: 2918e1363f0083b4bbf11bf832ad9f39,
         type: 3}
       propertyPath: InitialModule.startLifetime.scalar
@@ -10789,6 +10783,16 @@ PrefabInstance:
     - target: {fileID: 3568552387741691066, guid: 2918e1363f0083b4bbf11bf832ad9f39,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
+        type: 3}
+      propertyPath: m_Name
+      value: reactorvfx
+      objectReference: {fileID: 0}
+    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
+        type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -10812,16 +10816,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3376189397792839903}
     m_Modifications:
-    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
-        type: 3}
-      propertyPath: m_Name
-      value: reactorvfx
-      objectReference: {fileID: 0}
-    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3568552387723340282, guid: 2918e1363f0083b4bbf11bf832ad9f39,
         type: 3}
       propertyPath: InitialModule.startLifetime.scalar
@@ -10907,6 +10901,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
+        type: 3}
+      propertyPath: m_Name
+      value: reactorvfx
+      objectReference: {fileID: 0}
+    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2918e1363f0083b4bbf11bf832ad9f39, type: 3}
 --- !u!198 &7013078725064554932 stripped
@@ -10928,16 +10932,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 94730371271480695}
     m_Modifications:
-    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
-        type: 3}
-      propertyPath: m_Name
-      value: blacksmoke_r
-      objectReference: {fileID: 0}
-    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2045486493690952909, guid: 213bbc8e6fd04714d831b3a231d73a85,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -10998,6 +10992,16 @@ PrefabInstance:
       propertyPath: m_LocalScale.x
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
+        type: 3}
+      propertyPath: m_Name
+      value: blacksmoke_r
+      objectReference: {fileID: 0}
+    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 213bbc8e6fd04714d831b3a231d73a85, type: 3}
 --- !u!4 &4639170348183594899 stripped
@@ -11019,16 +11023,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 94730371271480695}
     m_Modifications:
-    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
-        type: 3}
-      propertyPath: m_Name
-      value: reactorvfx_starting
-      objectReference: {fileID: 0}
-    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3568552387723340282, guid: 2918e1363f0083b4bbf11bf832ad9f39,
         type: 3}
       propertyPath: lengthInSec
@@ -11149,6 +11143,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
+        type: 3}
+      propertyPath: m_Name
+      value: reactorvfx_starting
+      objectReference: {fileID: 0}
+    - target: {fileID: 3568552387741266074, guid: 2918e1363f0083b4bbf11bf832ad9f39,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2918e1363f0083b4bbf11bf832ad9f39, type: 3}
 --- !u!198 &5795693429130191800 stripped
@@ -11170,16 +11174,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 94730371271480695}
     m_Modifications:
-    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
-        type: 3}
-      propertyPath: m_Name
-      value: blacksmoke_l
-      objectReference: {fileID: 0}
-    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2045486493690952909, guid: 213bbc8e6fd04714d831b3a231d73a85,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -11240,6 +11234,16 @@ PrefabInstance:
       propertyPath: m_LocalScale.x
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
+        type: 3}
+      propertyPath: m_Name
+      value: blacksmoke_l
+      objectReference: {fileID: 0}
+    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 213bbc8e6fd04714d831b3a231d73a85, type: 3}
 --- !u!4 &8696072247889846134 stripped
@@ -11261,16 +11265,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3376189397792839903}
     m_Modifications:
-    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
-        type: 3}
-      propertyPath: m_Name
-      value: blacksmoke_l
-      objectReference: {fileID: 0}
-    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2045486493690952909, guid: 213bbc8e6fd04714d831b3a231d73a85,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -11330,6 +11324,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.x
       value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
+        type: 3}
+      propertyPath: m_Name
+      value: blacksmoke_l
+      objectReference: {fileID: 0}
+    - target: {fileID: 2045486493690585325, guid: 213bbc8e6fd04714d831b3a231d73a85,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2045486493675747725, guid: 213bbc8e6fd04714d831b3a231d73a85,
         type: 3}
