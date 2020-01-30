@@ -10142,6 +10142,11 @@ PrefabInstance:
       propertyPath: m_LocalScale.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 409712599920948561, guid: 6185f843241560c45a96ad17d2274932,
+        type: 3}
+      propertyPath: far clip plane
+      value: 20000
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6185f843241560c45a96ad17d2274932, type: 3}
 --- !u!4 &3376189397430417003 stripped
