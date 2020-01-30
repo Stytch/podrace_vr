@@ -4040,7 +4040,7 @@ PrefabInstance:
         type: 3}
       propertyPath: trackMaterial
       value: 
-      objectReference: {fileID: 2100000, guid: 754229dc66b057d40bcd2ebe48424571, type: 2}
+      objectReference: {fileID: 2100000, guid: 12716fd298137e049a588db656277d86, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ffb3cdd35e2338a468932401227bcc46, type: 3}
 --- !u!1 &1798327329
@@ -5218,6 +5218,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1739976606439134820, guid: ad15ec6b4ece4f343a0f31229d6cf624,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 17acad6491e7d8747985cf9983dda1eb, type: 2}
+    - target: {fileID: 2072014174041143842, guid: ad15ec6b4ece4f343a0f31229d6cf624,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -186.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2072014174041143842, guid: ad15ec6b4ece4f343a0f31229d6cf624,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1496.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2072014174041143845, guid: ad15ec6b4ece4f343a0f31229d6cf624,
+        type: 3}
+      propertyPath: m_GameManager
+      value: 
+      objectReference: {fileID: 1798327331}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ad15ec6b4ece4f343a0f31229d6cf624, type: 3}
 --- !u!1 &1927427978327423908 stripped
@@ -5293,5 +5313,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3602740122971313897, guid: fed6ec049f14257479efcc096f5a41db,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 17acad6491e7d8747985cf9983dda1eb, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fed6ec049f14257479efcc096f5a41db, type: 3}

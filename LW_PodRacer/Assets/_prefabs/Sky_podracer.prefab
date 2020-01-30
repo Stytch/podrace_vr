@@ -4085,12 +4085,12 @@ MonoBehaviour:
   - {fileID: 3376189397928257422}
   - {fileID: 144758533}
   body: {fileID: 3376189397980205561}
-  ground_repulsation: 40
+  ground_repulsation: 20
   body_speed_mult: 1500
   body_rotation_mult: 0.15
   body_stabilisator_mult: 0.0125
   body_inclinaison_maxangle: 100
-  body_hover_height: 10
+  body_hover_height: 15
   LeftReactor: {fileID: 9109495898039475511}
   RightReactor: {fileID: 3345094723689091407}
   LightningAnimation:
