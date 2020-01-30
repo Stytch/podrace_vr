@@ -315,7 +315,7 @@ public class SFX_Controller : MonoBehaviour
     }
     void update_UI_lives()
     {
-        ui.text_vie.text = lives.ToString() + " vie" + (lives < 0 ? "" : "s");
+        ui.text_vie.text = lives.ToString() + " vie" + (lives < 2 ? "" : "s");
         ui.img_feu.fillAmount = 1f - Mathf.Clamp01((lives) / (float)lives_start);
     }
     void update_UI_distanceTempete()
@@ -497,34 +497,35 @@ public class SFX_Controller : MonoBehaviour
     }
     public void ApplyDamage(bool resetVelocityAndPower)
     {
-        if (invulnerable) return;
+        if (!invulnerable)
+        {
+            print($"OnCollisionEnter : {--lives} lives");
+            update_UI_lives();
+            sources[0].PlayOneShot(clips[11]);
+            if (Mathf.Abs(lives) % 2 == 0)
+            {
+                foreach (var blacksmoke in LeftReactor.blacksmokes)
+                    if (!blacksmoke.activeInHierarchy)
+                    { blacksmoke.SetActive(true); break; }
+                LeftReactor.spawnExplosion();
+            }
+            else
+            {
+                foreach (var blacksmoke in RightReactor.blacksmokes)
+                    if (!blacksmoke.activeInHierarchy)
+                    { blacksmoke.SetActive(true); break; }
+                RightReactor.spawnExplosion();
+            }
 
-        print($"OnCollisionEnter : {--lives} lives");
-        sources[0].PlayOneShot(clips[11]);
-        if (Mathf.Abs(lives) % 2 == 0)
-        {
-            foreach (var blacksmoke in LeftReactor.blacksmokes)
-                if (!blacksmoke.activeInHierarchy)
-                { blacksmoke.SetActive(true); break; }
-            LeftReactor.spawnExplosion();
+            if (lives == 0) game_gameover();
+            if (resetVelocityAndPower)
+            {
+                reset_PodracerVelocity();
+                reset_EnginePower();
+            }
+            setInvulnerable();
+            StartCoroutine(invulnerableUIfx());
         }
-        else
-        {
-            foreach (var blacksmoke in RightReactor.blacksmokes)
-                if (!blacksmoke.activeInHierarchy)
-                { blacksmoke.SetActive(true); break; }
-            RightReactor.spawnExplosion();
-        }
-
-        if (lives == 0) game_gameover();
-        if (resetVelocityAndPower)
-        {
-            reset_PodracerVelocity();
-            reset_EnginePower();
-        }
-        setInvulnerable();
-        update_UI_lives();
-        StartCoroutine(invulnerableUIfx());
     }
     public void setInvulnerable()
     {
