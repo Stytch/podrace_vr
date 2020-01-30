@@ -111,7 +111,8 @@ public class TrackManager : MonoBehaviour
                     Vector3 vec = Vector3.zero;
                     foreach (Vector3 v in vertices)
                     {
-                        if (v.y < 0.5 && v.z == -12)
+                        //GENERIZEEEEEEEEEE
+                        if (v.y < 0.5 && v.z == -5.5)
                         {
                             count++;
                             vec += v;

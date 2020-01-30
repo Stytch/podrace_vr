@@ -99,9 +99,15 @@ public class GameManager : MonoBehaviour
 
     IEnumerator StartNewGame()
     {
-        //m_trackManager.CleanAll();
-        //m_trackManager.GenerateTrack();
-        //print(m_trackManager.GetEndPosition());
+        //GENERATION DU TRACK
+        try { m_trackManager.CleanAll(); }
+        catch { }
+        m_trackManager.GenerateTrack();
+        var end = m_trackManager.GetEndPosition();
+        end.y = go_ChunkEnd.transform.position.y;
+        print(end);
+        go_ChunkEnd.transform.position = end;
+
         gameAlive = true;
         print("START NEW GAME");
         m_tempete.moveEnabled = true;
