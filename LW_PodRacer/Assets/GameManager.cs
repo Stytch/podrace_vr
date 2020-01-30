@@ -31,11 +31,16 @@ public class GameManager : MonoBehaviour
     [Header("GAM/TRACK GENERATOR")]
     public TrackManager m_trackManager; // attente full integration procedural finoux
     public GameObject go_ChunkEnd;
+    [Header("GAM/CAMERAMAINMENU")]
+    private GameObject go_playerVR;
+    public GameObject gop_playerVR;
+    public Transform t_spawnMainCamera;
 
     void Start()
     {
         print("GAMEMANAGER_START");
-        panel_mainmenu.SetActive(true);
+        //panel_mainmenu.SetActive(true);
+        //spawnPlayerMainMenu();
     }
 
     public void startupbtn()
@@ -62,6 +67,7 @@ public class GameManager : MonoBehaviour
         go_Podracer = Instantiate(gop_Podracer, t_spawnPodracer.position, t_spawnPodracer.rotation);
         m_Podracer = go_Podracer.GetComponent<SFX_Controller>();
         m_Podracer.m_gamemanager = this;
+        m_Podracer.btnpower();
         cam_podracer = go_Podracer.GetComponentInChildren<Camera>().gameObject;
         m_Podracer.m_tempete = m_tempete;
         // TODO : ATTACH CAMERA ?
@@ -91,7 +97,7 @@ public class GameManager : MonoBehaviour
 
             //PRIMODIAL
             cam_mainmenu.SetActive(true);
-            panel_mainmenu.SetActive(true);
+            //panel_mainmenu.SetActive(true);
             gameAlive = false;
             m_tempete.moveEnabled = false;
         }
@@ -115,7 +121,7 @@ public class GameManager : MonoBehaviour
         closeEndGamePanel();
         panel_loose.SetActive(false);
         cam_mainmenu.SetActive(false);
-        panel_mainmenu.SetActive(false);
+        //panel_mainmenu.SetActive(false);
         generatePlayerPodracer();
         cam_podracer.SetActive(true);
         //
@@ -127,7 +133,17 @@ public class GameManager : MonoBehaviour
         cor_gameCoroutine = null;
         gameAlive = false;
         m_tempete.moveEnabled = false;
+        spawnPlayerMainMenu();
 
+
+
+    }
+
+    public void spawnPlayerMainMenu()
+    {
+        if (go_playerVR != null) Destroy(go_playerVR);
+        go_playerVR = Instantiate(gop_playerVR, t_spawnMainCamera.position, t_spawnMainCamera.rotation);
+        cam_mainmenu = go_playerVR.GetComponentInChildren<Camera>().gameObject;
     }
 
     // pour plus tard...

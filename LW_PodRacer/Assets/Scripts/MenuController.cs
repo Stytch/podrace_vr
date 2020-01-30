@@ -8,6 +8,7 @@ public class MenuController : MonoBehaviour
 
     public GameObject MenuButton;       //Contains the Prefab MenuButton, used to create buttons while opening menus
     public GameObject Canvas;           //Contains the Parent used when Instantiating Menu Buttons
+    public GameManager m_GameManager;
 
     void Start()
     {
@@ -28,6 +29,8 @@ public class MenuController : MonoBehaviour
     {
         //On lance le jeu
         Debug.Log("PlayButton Pressed");
+        //Activer vaisseau et cacher menu
+        m_GameManager.startupbtn();
     }
 
     /// <summary>

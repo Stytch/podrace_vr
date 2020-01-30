@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/sceneIntegrationProceduraleRemi.unity
-    guid: 975b52110440f684c8b40e71ce433277
+    path: Assets/Scenes/sceneIntegrationFinalRemi.unity
+    guid: e9f6165588debe545b8d11d7fc9cc3ed
   m_configObjects: {}

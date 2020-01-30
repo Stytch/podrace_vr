@@ -65,7 +65,7 @@ public class PropsGenerator : MonoBehaviour
 
             foreach (Track_part t in tg.all_tracks)
             {
-
+                
                 //ARCHE
                 int ind = Random.Range(-10 * t.points.Count, t.points.Count);
                 if (ind >= 0)

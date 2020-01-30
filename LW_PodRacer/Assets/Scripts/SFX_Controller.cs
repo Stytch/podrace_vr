@@ -148,7 +148,7 @@ public class SFX_Controller : MonoBehaviour
         if (Linear_R != null) val_Linear_R = Linear_R.value;
     }
 
-    void btnpower()
+    public void btnpower()
     {
         if (engineStateChange) return;
         if (engineState == 0)
