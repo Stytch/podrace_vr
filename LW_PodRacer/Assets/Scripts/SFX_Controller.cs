@@ -107,6 +107,8 @@ public class SFX_Controller : MonoBehaviour
     [Header("STEAM_VR")]
     public Valve.VR.InteractionSystem.LinearMapping Linear_L;
     public Valve.VR.InteractionSystem.LinearMapping Linear_R;
+    public Valve.VR.InteractionSystem.Hand hand_L;
+    public Valve.VR.InteractionSystem.Hand hand_R;
     private float val_Linear_L = 0.0f;
     private float val_Linear_R = 0.0f;
 
@@ -133,8 +135,8 @@ public class SFX_Controller : MonoBehaviour
 
     // LES CONTROLES
     private bool input_RESET { get => Input.GetKeyDown(KeyCode.KeypadMultiply) || Input.GetButtonDown("joystick button 6"); }
-    private bool input_BOOSTING { get => (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5")) || Input.GetKey(KeyCode.Keypad3); }
-    private bool input_BREAKING { get => (Input.GetKey(KeyCode.KeypadPlus) || Input.GetKey("joystick button 3")); }
+    private bool input_BOOSTING { get => (Input.GetButton("joystick button 4") && Input.GetButton("joystick button 5")) || Input.GetKey(KeyCode.Keypad3) || (hand_R != null && Valve.VR.SteamVR_Actions._default.Teleport[Valve.VR.SteamVR_Input_Sources.RightHand].state); }
+    private bool input_BREAKING { get => (Input.GetKey(KeyCode.KeypadPlus) || Input.GetKey("joystick button 3")) || (hand_L != null && Valve.VR.SteamVR_Actions._default.Teleport[Valve.VR.SteamVR_Input_Sources.LeftHand].state); }
     private bool input_BREAKING_down { get => (Input.GetKeyDown(KeyCode.KeypadPlus) || Input.GetKeyDown("joystick button 3")); }
     private bool input_SWITCHPOWER { get => (Input.GetKeyDown(KeyCode.Keypad0) || Input.GetButtonDown("joystick button 1")); }
     private float input_POWER_LEFT { get => (Input.GetKey(KeyCode.Keypad2) ? 1f : 0) + Input.GetAxis("LT") + val_Linear_L; }
@@ -146,8 +148,15 @@ public class SFX_Controller : MonoBehaviour
         if (Linear_R != null) val_Linear_R = Linear_R.value;
     }
 
+
     void Update()
     {
+        //Valve.VR.EVRButtonId triggerButton = Valve.VR.EVRButtonId.k_EButton_A;
+        //Valve.VR.SteamVR_Input blabla = Valve.VR.SteamVR_Input.
+        if(Valve.VR.SteamVR_Actions._default.Teleport[Valve.VR.SteamVR_Input_Sources.LeftHand].state)
+        {
+
+        }
         /* --- BASIC INPUTS ----------*/
         if (input_RESET)
         {
