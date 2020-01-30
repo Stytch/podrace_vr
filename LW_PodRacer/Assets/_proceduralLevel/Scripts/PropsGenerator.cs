@@ -71,8 +71,9 @@ public class PropsGenerator : MonoBehaviour
                 if (ind >= 0)
                 {
                     Point point = t.points[ind];
+                    Vector3 position = point.position + Vector3.down * 7; // descend l'arche pour qu'elle touche le sol
 
-                    GameObject a = InstanceProps(ark, point.position, 0.0f, new Vector3(3, 3, 3));
+                    GameObject a = InstanceProps(ark, position, 0.0f, new Vector3(3, 3, 3));
                     a.transform.forward = point.tangent;
                 }
 
