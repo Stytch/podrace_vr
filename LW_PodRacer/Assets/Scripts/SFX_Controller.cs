@@ -148,21 +148,10 @@ public class SFX_Controller : MonoBehaviour
         if (Linear_R != null) val_Linear_R = Linear_R.value;
     }
 
-
-    void Update()
+    void btnpower()
     {
-        //Valve.VR.EVRButtonId triggerButton = Valve.VR.EVRButtonId.k_EButton_A;
-        //Valve.VR.SteamVR_Input blabla = Valve.VR.SteamVR_Input.
-        if(Valve.VR.SteamVR_Actions._default.Teleport[Valve.VR.SteamVR_Input_Sources.LeftHand].state)
-        {
-
-        }
-        /* --- BASIC INPUTS ----------*/
-        if (input_RESET)
-        {
-            reset_Podracer();
-        }
-        if (input_SWITCHPOWER && engineState == 0 && !engineStateChange)
+        if (engineStateChange) return;
+        if (engineState == 0)
         {
             engineStateChange = true;
             print("Engine_Start");
@@ -170,14 +159,26 @@ public class SFX_Controller : MonoBehaviour
             Invoke("Engine_Start", duration_engine_starting);
             Invoke("StartConnexion", 1f);
         }
-        else if (input_SWITCHPOWER && engineState == 1 && !engineStateChange)
+        else if (engineState == 1)
         {
             engineStateChange = true;
             print("Engine_Shutdown");
             sources[0].PlayOneShot(clips[7]);
             Invoke("Engine_Shutdown", duration_engine_shutdown);
         }
+    }
 
+    void Update()
+    {
+        /* --- BASIC INPUTS ----------*/
+        if (input_RESET)
+        {
+            reset_Podracer();
+        }
+        if (input_SWITCHPOWER)
+        {
+            btnpower();
+        }
         if (engineState > 0)
         {
             if (Input.GetKeyDown(KeyCode.KeypadMinus)) ApplyDamage(true);
